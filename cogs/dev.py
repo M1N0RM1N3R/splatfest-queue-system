@@ -45,7 +45,7 @@ class DevCog(discord.Cog):
     root = discord.SlashCommandGroup(
         name='dev', description='Internal commands restricted to M1N3R only.', checks=[is_owner])
 
-    @root.command(name='run')
+    @root.command(name='execute')
     async def execute(self, ctx: discord.ApplicationContext, script: str):
         await ctx.defer(ephemeral=True)
         output = str(eval(script) or '✅')

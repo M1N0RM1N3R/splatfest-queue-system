@@ -4,12 +4,10 @@ from typing import Callable
 
 import discord
 import pyotp
-import yaml
-from yaml import CBaseLoader
 
 from classes import *
 
-totp = pyotp.TOTP('5YJCKGMRJUK52LSAWCDYEBOTKMOQY4KN')
+totp = pyotp.TOTP(config['totp_secret'])
 
 
 async def is_owner(

@@ -1,9 +1,10 @@
-import discord
-import yaml
-from yaml import CBaseLoader
+import logging
 import dateparser
+import discord
 
 from classes import *
+
+log = logging.getLogger(__name__)
 
 def iso8601_option_autocomplete(actx: discord.AutocompleteContext) -> List[str]:
     try:
@@ -41,5 +42,7 @@ class ToolsCog(discord.Cog):
             when.timestamp())
         await ctx.send_followup(f'✅ {when.isoformat()}: `{result}` (Preview: {result})', ephemeral=ephemeral)
 
+
 def setup(bot: discord.Bot):
     bot.add_cog(ToolsCog(bot))
+    log.info("Tools cog initialized")

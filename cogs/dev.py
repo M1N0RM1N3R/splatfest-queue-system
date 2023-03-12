@@ -1,41 +1,12 @@
-import asyncio
-import datetime
-from typing import Callable
-
+import logging
 import discord
-import pyotp
 
 from classes import *
 
-totp = pyotp.TOTP(config['totp_secret'])
-
+log = logging.getLogger(__name__)
 
 async def is_owner(
     ctx: discord.ApplicationContext): return await ctx.bot.is_owner(ctx.user)
-
-
-class AuthModal(discord.ui.Modal):
-    def __init__(self):
-        self.value = None
-        super().__init__(title="Secondary Authentication Required", timeout=60)
-        self.add_item(discord.ui.InputText(
-            label="TOTP", placeholder='123456', min_length=6, max_length=6))
-
-    async def callback(self, interaction: discord.Interaction):
-        self.value = totp.verify(self.children[0].value)
-        await interaction.response.defer()
-
-
-async def wait_for(condition: Callable[..., bool], timeout: float = None, poll_interval: float = 0.1, *args, **kwargs) -> bool:
-    if timeout:
-        stop_time = datetime.datetime.now() + datetime.timedelta(seconds=timeout)
-    while True:
-        if condition(*args, **kwargs):
-            return True
-        elif timeout:
-            if datetime.datetime.now() > stop_time:
-                return False
-        await asyncio.sleep(poll_interval)
 
 
 class DevCog(discord.Cog):
@@ -55,3 +26,4 @@ class DevCog(discord.Cog):
 
 def setup(bot: discord.Bot):
     bot.add_cog(DevCog(bot))
+    log.info("Dev cog initialized")

@@ -5,8 +5,10 @@ Current features include:
 * Custom webhook messages when members join/leave the server.
 * Quick, easy conversion of natural-language dates/times to Discord timestamps.
 
-Planned features include:
+Currently working on:
 * Automated LANarchy results submission and tracking
+
+Planned features include:
 * Session-based matchmaking system
 * Handling server custom Splatfests
 

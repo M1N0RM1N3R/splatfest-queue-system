@@ -41,7 +41,8 @@ class GameConfirmView(discord.ui.View):
 async def adjust_ranks(winners, losers):
     w_players = [get_player_by_id(id) for id in winners]
     l_players = [get_player_by_id(id) for id in losers]
-    absolute = sum([_.rank + 1 for _ in l_players]) / sum([_.rank + 1 for _ in w_players]) * config['lanarchy']['diff_multiplier']
+    absolute = sum(_.rank + 1 for _ in l_players) / sum(_.rank + 1 for _ in w_players) * config['lanarchy']['diff_multiplier']
+
     for player in w_players:
         player.rank_points += absolute
         if player.rank_points >= config['lanarchy']['ranks'][player.rank]['points_target']:

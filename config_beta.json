@@ -1,0 +1,153 @@
+{
+    "guild": 1075219408533868576,
+    "log_channel": 1075221663823704200,
+    "announcements_channel": 1075221042529828900,
+    "mod_role": 1075222819153133700,
+    "admin_role": 1075222884487790700,
+    "welcome": {
+        "join_avatar": "https://cdn.discordapp.com/attachments/1066917293935841340/1079624383410216970/Picsart_22-10-18_17-30-36-248.png",
+        "leave_avatar": "https://cdn.discordapp.com/attachments/1066917293935841340/1079624383804493864/Picsart_22-10-18_21-30-54-748.png",
+        "join_template": "<:Booyah:847300266566746153> {mention} joined **Splatfest!**\nCheck out <#761797254683164712>! <:splatfest:1024053687217295460> <:splatlove:1057108266062196827>",
+        "leave_template": "<:Ouch:847300319071043604> {name}#{discriminator} just left **Splatfest...**\n<:1member:803768545816084480> <:splatbroke:1057109111097004103>"
+    },
+    "lanarchy": {
+        "open_channel": 1075220665361240200,
+        "series_win_bonus": 15,
+        "ranks": [
+            {
+                "name": "C",
+                "series_channel": 1075220749733867600,
+                "role": 1075223056810791000,
+                "points_target": 350,
+                "series_cost": 20,
+                "series_win_value": 20,
+                "open_win_value": 8,
+                "open_loss_value": 1
+            },
+            {
+                "name": "B",
+                "series_channel": 1075220786035568800,
+                "role": 1075223141036597400,
+                "points_target": 600,
+                "series_cost": 70,
+                "series_win_value": 30,
+                "open_win_value": 8,
+                "open_loss_value": 2
+            },
+            {
+                "name": "A",
+                "series_channel": 1075220831518605300,
+                "role": 1075223183386480600,
+                "points_target": 750,
+                "series_cost": 120,
+                "series_win_value": 40,
+                "open_win_value": 8,
+                "open_loss_value": 3
+            },
+            {
+                "name": "S",
+                "series_channel": 1075220878859702400,
+                "role": 1075223211219898400,
+                "points_target": 900,
+                "series_cost": 170,
+                "series_win_value": 50,
+                "open_win_value": 8,
+                "open_loss_value": 4
+            },
+            {
+                "name": "X",
+                "series_channel": 1075220906667950200,
+                "role": 1075223242593275900,
+                "points_target": 9223372036854776000,
+                "series_cost": 180,
+                "series_win_value": 60,
+                "open_win_value": 8,
+                "open_loss_value": 5
+            }
+        ],
+        "map_pool": {
+            "sz": [
+                "gorge",
+                "market",
+                "museum",
+                "inkblot",
+                "wahoo",
+                "makomart",
+                "springs",
+                "ruins"
+            ]
+        },
+        "tc": [
+            "alley",
+            "mincemeat",
+            "museum",
+            "bridge",
+            "makomart",
+            "heights",
+            "manta"
+        ],
+        "rm": [
+            "mincemeat",
+            "spillway",
+            "market",
+            "inkblot",
+            "shipyard",
+            "heights"
+        ],
+        "cb": [
+            "gorge",
+            "alley",
+            "spillway",
+            "resort",
+            "shipyard",
+            "springs",
+            "manta"
+        ]
+    },
+    "splatfest": {
+        "pledge_box_channel": 1075222021488775300,
+        "tricolor_host_role": 1075223442334429200,
+        "tricolor_prereq_roles": [1090825717983482039],
+        "alpha_role": 1075232585422225400,
+        "bravo_role": 1075232643098083300,
+        "charlie_role": 1075232684416192600,
+        "tricolor_channel": 1075222161985372200,
+        "regular_channel": 1075222115034353700
+    },
+    "multiplayer_methods": {
+        "nso": {
+            "name": "Switch Online"
+        },
+        "lan": {
+            "name": "LAN Play"
+        },
+        "kai": {
+            "name": "XLink Kai"
+        }
+    },
+    "names": {
+        "tw": "Turf War",
+        "sz": "Splat Zones",
+        "tc": "Tower Control",
+        "rm": "Rainmaker",
+        "cb": "Clam Blitz",
+        "tctw": "TriColor Turf War",
+        "bctw": "BiColor Turf War",
+        "gorge": "Scorch Gorge",
+        "alley": "Eeltail Alley",
+        "mincemeat": "Mincemeat Metalworks",
+        "spillway": "Undertow Spillway",
+        "market": "Hagglefish Market",
+        "museum": "Museum d'Alfonsino",
+        "resort": "Mahi-Mahi Resort",
+        "bridge": "Hammerhead Bridge",
+        "inkblot": "Inkblot Art Academy",
+        "shipyard": "Sturgeon Shipyard",
+        "wahoo": "Wahoo World",
+        "makomart": "MakoMart",
+        "springs": "Brinewater Springs",
+        "heights": "Flounder Heights",
+        "manta": "Manta Maria",
+        "ruins": "Um'ami Ruins"
+    }
+}

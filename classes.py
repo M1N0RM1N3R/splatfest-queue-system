@@ -13,7 +13,8 @@ from ZODB.FileStorage import FileStorage
 from bot import bot
 
 config: Dict[str, str | int | float | list |
-             dict] = json.load(open('config.json'))
+             dict] = json.load(open('config_beta.json'))
+secrets: Dict[str, str] = json.load(open('secrets.json'))
 
 
 async def wait_for(condition: Callable[..., bool], timeout: float = None, poll_interval: float = 0.1, *args, **kwargs) -> bool:
@@ -36,6 +37,7 @@ connection = db.open()
 root = connection.root()
 print('DONE!')
 
+clean = discord.utils.escape_markdown
 
 @dataclass
 class Resource:

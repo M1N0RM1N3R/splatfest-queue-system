@@ -16,7 +16,7 @@ class WelcomeCog(discord.Cog):
     def __init__(self, bot: discord.Bot) -> None:
         self.bot = bot
         self.log_channel = self.bot.get_channel(config['log_channel'])
-        self.webhook = discord.Webhook.from_url(config['welcome']['webhook_url'], session=aiohttp.ClientSession())
+        self.webhook = discord.Webhook.from_url(secrets['welcome_webhook'], session=aiohttp.ClientSession())
 
     @cmd.Cog.listener()
     async def on_member_join(self, member: discord.Member):

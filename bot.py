@@ -10,15 +10,16 @@ import yaml
 log = logging.getLogger(__name__)
 
 config: Dict[str, str | int | float | list |
-             dict] = json.load(open('config.json'))
+             dict] = json.load(open('config_beta.json'))
 
 bot = discord.Bot(debug_guilds=[config['guild']],
                   intents=discord.Intents(members=True))
 
+guild = lambda: bot.get_guild(config['guild'])
 
 @bot.slash_command(name='ping')
 async def ping(ctx):
-    await ctx.send_response(f"🏓 Pong! Latency: {int(bot.latency*1000)}ms")
+    await ctx.send_response(f"🏓 Pong! Latency: {int(bot.latency*1000)}ms.")
 
 
 @bot.event
@@ -28,7 +29,7 @@ async def on_ready():
 
 @bot.event
 async def on_disconnect():
-    log.error(f"Lost connection to Discord!")
+    log.error("Lost connection to Discord!")
 
 
 @bot.event

@@ -14,9 +14,9 @@ log = logging.getLogger(__name__)
 
 @tasks.loop(minutes=5)
 async def commit_db():
-    log.info(f"Committing changes to database...")
+    log.info("Committing changes to database...")
     transaction.commit()
-    log.info(f"Done committing changes to database")
+    log.info("Done committing changes to database")
 
 
 for cog_name in [
@@ -24,7 +24,9 @@ for cog_name in [
     'tools',
     'welcome'
 ]:
-    bot.load_extension('cogs.'+cog_name)
+    bot.load_extension(f'cogs.{cog_name}')
 
-bot.run(config['bot_token'])
+bot.run(secrets['bot_token'])
+log.info("Committing changes to database...")
 transaction.commit()
+log.info("Done committing changes to database")

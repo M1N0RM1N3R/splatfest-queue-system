@@ -38,7 +38,7 @@ class WelcomeCog(discord.Cog):
                 member (discord.Member): The member that just left.
         """
         await webhook.send(
-            content=f"<a:Ouch:847300319071043604> {member} just left **Splatfest...**\n<:1member:803768545816084480> <:splatbroke:1057109111097004103>",
+            content=f"<a:Ouch:847300319071043604> {member} just left **Splatfest...**\n<a:1member:803768545816084480> <:splatbroke:1057109111097004103>",
             username=invisible_username,
             avatar_url="https://cdn.discordapp.com/attachments/1066917293935841340/1079624383804493864/Picsart_22-10-18_21-30-54-748.png",
         )

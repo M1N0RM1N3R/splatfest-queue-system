@@ -25,7 +25,7 @@ class WelcomeCog(discord.Cog):
                 member (discord.Member): The new member.
         """
         await webhook.send(
-            content=f"<:Booyah:847300266566746153> {member.mention} joined **Splatfest!**\nCheck out <#761797254683164712>! <:splatfest:1024053687217295460> <:splatlove:1057108266062196827>",
+            content=f"<a:Booyah:847300266566746153> {member.mention} joined **Splatfest!**\nCheck out <#761797254683164712>! <:splatfest:1024053687217295460> <:splatlove:1057108266062196827>",
             username=invisible_username,
             avatar_url="https://cdn.discordapp.com/attachments/1066917293935841340/1079624383410216970/Picsart_22-10-18_17-30-36-248.png",
         )
@@ -38,7 +38,7 @@ class WelcomeCog(discord.Cog):
                 member (discord.Member): The member that just left.
         """
         await webhook.send(
-            content=f"<:Ouch:847300319071043604> {member} just left **Splatfest...**\n<:1member:803768545816084480> <:splatbroke:1057109111097004103>",
+            content=f"<a:Ouch:847300319071043604> {member} just left **Splatfest...**\n<:1member:803768545816084480> <:splatbroke:1057109111097004103>",
             username=invisible_username,
             avatar_url="https://cdn.discordapp.com/attachments/1066917293935841340/1079624383804493864/Picsart_22-10-18_21-30-54-748.png",
         )

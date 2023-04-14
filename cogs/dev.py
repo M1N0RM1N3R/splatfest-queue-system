@@ -42,7 +42,7 @@ class DevCog(discord.Cog):
         """
         await ctx.defer(ephemeral=True)
         # Fetch and merge commit from GitHub
-        for cmd in ["git fetch remote main", f"git merge {commit_id}"]:
+        for cmd in ["git fetch origin main", f"git merge {commit_id}"]:
             if exit_status := await self.bot.loop.run_in_executor(None, os.system, cmd):
                 return await ctx.send_followup(
                     f"❌ Update failed: `{cmd}` returned exit status {exit_status}."

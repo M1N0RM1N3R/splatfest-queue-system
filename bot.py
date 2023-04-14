@@ -9,22 +9,51 @@ import yaml
 
 log = logging.getLogger(__name__)
 
-config: Dict[str, str | int | float | list |
-             dict] = json.load(open('config_beta.json'))
+config: Dict[str, str | int | float | list | dict] = json.load(open("config_beta.json"))
 
-bot = discord.Bot(debug_guilds=[config['guild']],
-                  intents=discord.Intents(members=True))
+bot = discord.Bot(debug_guilds=[config["guild"]], intents=discord.Intents(members=True))
 
-guild = lambda: bot.get_guild(config['guild'])
+guild = lambda: bot.get_guild(config["guild"])
+log_channel = bot.get_channel(config["log_channel"])
 
-@bot.slash_command(name='ping')
+
+@bot.slash_command(name="ping", description="Check the bot's status.")
 async def ping(ctx):
+    """Ensures that the bot is working properly, and shows the latency between the host and the Discord gateway."""
     await ctx.send_response(f"🏓 Pong! Latency: {int(bot.latency*1000)}ms.")
+
+
+@bot.slash_command(name="help", description="Show detailed help about a command.")
+async def help(
+    ctx,
+    command=discord.Option(
+        str,
+        description="The command to get help for.",
+        autocomplete=discord.utils.basic_autocomplete(
+            lambda ctx: [
+                cmd.qualified_name
+                for cmd in bot.walk_application_commands()
+                if type(cmd) != discord.SlashCommandGroup
+            ]
+        ),
+        optional=False,
+    ),
+):
+    """You really need help with using the /help command? You just used it. Have an Easter egg: 🥚"""
+    await ctx.send_response(
+        f"> **{command}**\n{bot.get_application_command(command).callback.__doc__}",
+        ephemeral=True,
+    )
+
+
+@bot.event
+async def on_login():
+    log.info(f"Logged in as {bot.user}")
 
 
 @bot.event
 async def on_ready():
-    log.info(f"Logged in as {bot.user}")
+    log.info("Ready!")
 
 
 @bot.event
@@ -34,15 +63,21 @@ async def on_disconnect():
 
 @bot.event
 async def on_error(event, *args, **kwargs):
-    log.exception(
-        f'Uncaught exception in event "{event}"! Event information:\n{yaml.dump({"args": args, "kwargs": kwargs})}')
+    log.exception(f'Uncaught exception in event "{event}"!')
 
 
 @bot.event
-async def on_application_command_error(ctx: discord.ApplicationContext, error: discord.DiscordException):
+async def on_application_command_error(
+    ctx: discord.ApplicationContext, error: discord.DiscordException
+):
     if isinstance(error, commands.CommandOnCooldown):
-        await ctx.respond(f"❌⏳ This command is on cooldown. Please try again <t:{datetime.datetime.now().timestamp() + error.retry_after}:R>.")
+        await ctx.respond(
+            f"❌⏳ This command is on cooldown. Please try again <t:{datetime.datetime.now().timestamp() + error.retry_after}:R>."
+        )
     else:
-        await ctx.respond(f"❌⚠️ Something went wrong on our end: {str(error)}")
+        await ctx.respond(
+            f"❌ Something went wrong on our end: {str(error)}", ephemeral=True
+        )
         log.exception(
-            f'Uncaught exception in application command "{ctx.command.qualified_name}"! CTX information:\n{yaml.dump(ctx)}')
+            f'Uncaught exception in application command "{ctx.command.qualified_name}"!'
+        )

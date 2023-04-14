@@ -2,3 +2,4 @@ ZODB
 py-cord
 aiohttp
 dateparser
+shortuuid

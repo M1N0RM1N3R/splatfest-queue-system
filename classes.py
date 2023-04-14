@@ -7,13 +7,13 @@ from typing import Callable, Dict, List
 import dateparser
 
 import discord
-from cuid2 import CUID
+import shortuuid
 from glicko2 import Player as Glicko2
 from ZODB import DB
 from ZODB.FileStorage import FileStorage
 from bot import *
 
-config: Dict[str, str | int | float | list | dict] = json.load(open("config_beta.json"))
+config = json.load(open("config_beta.json"))
 secrets: Dict[str, str] = json.load(open("secrets.json"))
 
 
@@ -53,7 +53,7 @@ async def delay(duration: float, coroutine, **kwargs):
 
 @dataclass
 class Resource:
-    id: str = field(default_factory=CUID().generate, kw_only=True)
+    id: str = field(default_factory=shortuuid.uuid(), kw_only=True)
     owner_id: int  # The Discord user ID that owns this resource.
     created_at: datetime.datetime = field(
         default_factory=datetime.datetime.now, kw_only=True

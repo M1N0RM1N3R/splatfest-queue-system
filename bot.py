@@ -9,7 +9,7 @@ import yaml
 
 log = logging.getLogger(__name__)
 
-config: Dict[str, str | int | float | list | dict] = json.load(open("config_beta.json"))
+config = json.load(open("config_beta.json"))
 
 bot = discord.Bot(debug_guilds=[config["guild"]], intents=discord.Intents(members=True))
 

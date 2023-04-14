@@ -49,7 +49,7 @@ class DevCog(discord.Cog):
                 )
 
         # Unload the old cogs
-        for cog in self.bot.extensions.keys():
+        for cog in list(self.bot.extensions.keys()):
             self.bot.unload_extension(cog)
         # Load in the new cogs
         errors = {}

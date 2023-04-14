@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="https://media.discordapp.net/attachments/1066917293935841340/1090347607928340542/ddbecbe2-47ac-4f66-821b-fd20c34f823d.png" />
-</p>
-
 # Splatfest Queue System (A.K.A. Kolkra)
 The Splatfest Queue System (SQS for short) is a custom Discord bot built to streamline matchmaking and other tasks in the [Splatfest Discord server](https://discord.gg/rhAH6vp).
 

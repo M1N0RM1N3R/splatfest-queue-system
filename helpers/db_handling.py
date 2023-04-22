@@ -9,7 +9,7 @@ class ObjectExists(Exception):
     pass
 
 
-async def store(obj: Resource, upsert: bool = True):
+def store(obj: Resource, upsert: bool = True):
     """Stores an object in the database.
 
     Args:
@@ -37,7 +37,7 @@ async def store(obj: Resource, upsert: bool = True):
             )
 
 
-async def get(obj_type: str, id: str, none_if_missing: bool = True):
+def get(obj_type: str, id: str, none_if_missing: bool = True):
     """Gets a resource based on its ID. Faster than using search().
 
     Args:
@@ -61,7 +61,7 @@ async def get(obj_type: str, id: str, none_if_missing: bool = True):
             raise
 
 
-async def search(
+def search(
     obj_type: str, cond: Callable[[Resource], bool], single_object: bool = True
 ) -> Resource | filter:
     """Searches for a given object type that satisfies a given condition.
@@ -75,19 +75,21 @@ async def search(
         Resource | filter: The resulting object or iterable of objects.
     """
     log.debug(
-        f"Searching {obj} objects with cond {cond}, single_object={single_object}"
+        f"Searching {obj_type} objects with cond {cond}, single_object={single_object}"
     )
     try:
         table = db_root[obj_type]
     except KeyError:
         db_root[obj_type] = {}
         return None
-    if return_multiple:
-        return filter(cond, table)
-    return next((v for v in db_root[obj_type].values() if cond(v)), None)
+    return (
+        next((v for v in db_root[obj_type].values() if cond(v)), None)
+        if single_object
+        else filter(cond, table)
+    )
 
 
-async def delete(obj_type: str, id: str):
+def delete(obj_type: str, id: str):
     """Removes a resource from the database.
 
     Args:

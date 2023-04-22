@@ -2,13 +2,12 @@ import asyncio
 import datetime
 import json
 from dataclasses import dataclass, field
-from enum import Enum
+from logging import LogRecord
 from typing import Callable, Dict, List
 import dateparser
 
 import discord
 import shortuuid
-from glicko2 import Player as Glicko2
 from ZODB import DB
 from ZODB.FileStorage import FileStorage
 from bot import *
@@ -53,7 +52,7 @@ async def delay(duration: float, coroutine, **kwargs):
 
 @dataclass
 class Resource:
-    id: str = field(default_factory=shortuuid.uuid(), kw_only=True)
+    id: str = field(default_factory=shortuuid.uuid, kw_only=True)
     owner_id: int  # The Discord user ID that owns this resource.
     created_at: datetime.datetime = field(
         default_factory=datetime.datetime.now, kw_only=True
@@ -61,10 +60,10 @@ class Resource:
     updated_at: datetime.datetime = field(default=None, kw_only=True)
 
     def embed(self, fields: Dict[str, str]):
-        user = bot.get_guild(config["guild_id"]).get_member(self.owner_id)
-        embed = discord.Embed(title=self.__class__.__doc__)
+        user = bot.get_guild(config["guild"]).get_member(self.owner_id)
+        embed = discord.Embed(title=self.__class__.__name__)
         embed.set_footer(
-            f"{self.__class__.__name__} ID: {self.id} | Made with <:splatlove:1057108266062196827> by M1N3R"
+            text=f"{self.__class__.__name__} ID: {self.id} | Made with 💚 by M1N3R"
         )
         for k, v in fields.items():
             embed.add_field(name=k, value=v)
@@ -77,70 +76,6 @@ class Resource:
             name != "updated_at"
         ):  # prevent setting updated_at from causing a recursive loop
             self.updated_at = datetime.datetime.now()
-
-
-@dataclass
-class PlayerProfile(Resource):
-    """Player Information"""
-
-    rank: int  # The player's rank tier. (0=C, 1=B, 2=A, 3=S, 4=X)
-    rank_points: int  # The player's rank points.
-    series_wins: int
-    series_losses: int
-    series_active: bool
-    # Player experience, increased by playing matches. Not to be confused with X Power.
-    xp: int
-    # A Glicko2 rating, implemented using the glicko2 module. (https://pypi.org/project/glicko2/)
-    glicko2: Glicko2
-    # The player's NSO friend code. Defaults to "Not Set" and can also be set to "Banned" (self explanatory).
-    friend_code: str
-    # The LAN play server the player prefers to use. Defaults to "Not Set".
-    main_lan_server: str
-    xtag: str
-    ign: str
-
-    def embed(self):
-        return super().embed(
-            {
-                "Rank": f"{self.rank}/{self.rank_points}lrp",
-                "XP": self.xp,
-                "NSO Friend Code": self.friend_code,
-                "Main LAN play server": self.main_lan_server,
-                "XLink Kai username": self.xtag,
-                "In-game name": self.ign,
-            }
-        )
-
-
-def new_player_info():
-    return {
-        "rank": 0,
-        "rank_points": 100,
-        "series_wins": 0,
-        "series_losses": 0,
-        "series_active": False,
-        "xp": 0,
-        "glicko2": Glicko2(),
-        "nso_friend_code": "Not set",
-        "main_lan_server": "Not set",
-        "xlink_kai_username": "Not set",
-    }
-
-
-try:
-    db_root["players"]
-except KeyError:
-    db_root["players"] = {}
-
-
-def get_player_by_id(discord_id):
-    try:
-        player = db_root["players"][discord_id]
-    except KeyError:
-        player = PlayerProfile(owner_id=discord_id, **new_player_info())
-        db_root["players"][discord_id] = player
-    finally:
-        return player
 
 
 def iso8601_option_autocomplete(actx: discord.AutocompleteContext) -> List[str]:
@@ -156,3 +91,27 @@ def iso8601_option(desc):
         description=f"{desc} (Tip: I can format natural language!)",
         autocomplete=iso8601_option_autocomplete,
     )
+
+
+class DiscordLogHandler(logging.Handler):
+    def __init__(
+        self,
+        level=logging.NOTSET,
+    ):
+        super().__init__(level)
+
+    def emit(self, record: LogRecord) -> None:
+        embed = discord.Embed(title=f"{record.levelname} at {record.module}:{record.lineno} in {record.funcName}",description=clean(record.message),timestamp=datetime.datetime.fromtimestamp(record.created))
+
+        embed.set_thumbnail(
+            url={
+                "DEBUG": "https://cdn-icons-png.flaticon.com/512/2818/2818757.png",
+                "INFO": "https://cdn-icons-png.flaticon.com/512/1304/1304036.png",
+                "WARNING": "https://cdn-icons-png.flaticon.com/512/2684/2684750.png",
+                "ERROR": "https://cdn-icons-png.flaticon.com/512/2797/2797263.png",
+                "CRITICAL": "https://cdn-icons-png.flaticon.com/512/559/559375.png",
+            }[record.levelname]
+        )
+        if record.exc_text:
+            embed.add_field(name="Exception info", value=record.exc_text)
+        bot.loop.create_task(log_channel.send(embed=embed))

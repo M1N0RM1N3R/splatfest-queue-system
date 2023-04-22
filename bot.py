@@ -1,11 +1,9 @@
 import datetime
 import json
 import logging
-from typing import Dict
 
 import discord
 from discord.ext import commands
-import yaml
 
 log = logging.getLogger(__name__)
 
@@ -14,7 +12,7 @@ config = json.load(open("config_beta.json"))
 bot = discord.Bot(debug_guilds=[config["guild"]], intents=discord.Intents(members=True))
 
 guild = lambda: bot.get_guild(config["guild"])
-log_channel = bot.get_channel(config["log_channel"])
+log_channel = lambda: bot.get_channel(config["log_channel"])
 
 
 @bot.slash_command(name="ping", description="Check the bot's status.")
@@ -54,6 +52,10 @@ async def on_login():
 @bot.event
 async def on_ready():
     log.info("Ready!")
+    
+    for channel in bot.get_all_channels():
+        print("Go!")
+        print(channel)
 
 
 @bot.event
@@ -64,6 +66,10 @@ async def on_disconnect():
 @bot.event
 async def on_error(event, *args, **kwargs):
     log.exception(f'Uncaught exception in event "{event}"!')
+
+@bot.event
+async def on_application_command(context:discord.ApplicationContext):
+    log.info(f'"{context.command.qualified_name}" invoked by {context.author} with args {context.options}')
 
 
 @bot.event
@@ -78,6 +84,4 @@ async def on_application_command_error(
         await ctx.respond(
             f"❌ Something went wrong on our end: {str(error)}", ephemeral=True
         )
-        log.exception(
-            f'Uncaught exception in application command "{ctx.command.qualified_name}"!'
-        )
+        log.exception(f'Uncaught exception in command "{ctx.command}"!', exc_info=(type(error), error, error.__traceback__))

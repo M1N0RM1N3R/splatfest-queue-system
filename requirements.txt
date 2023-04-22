@@ -3,3 +3,4 @@ py-cord
 aiohttp
 dateparser
 shortuuid
+glicko2

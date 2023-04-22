@@ -215,7 +215,7 @@ class FunCog(discord.Cog):
         challenge = ChallengeView(ctx.author, opponent, To2Board)
         challenge_msg = await ctx.send_response(f"⚔️ {opponent.mention} You have been challenged to a game of TickoaTTwo by {ctx.author.mention}!" if opponent else f"⚔️ {ctx.author.mention} is looking for an opponent to play TickoaTTwo!", view=challenge, embed=challenge.embed())
         if await challenge.wait():
-            await challenge_msg.edit_original_response("⌛ This challenge has timed out.")
+            await challenge_msg.edit_original_response(content="⌛ This challenge has timed out.")
         else:
             assert challenge.opponent is not None
             game = To2Board(challenge.challenger, challenge.opponent)
@@ -232,7 +232,7 @@ class FunCog(discord.Cog):
         ).stdout.decode("utf-8")
         try:
             await self.bot.change_presence(activity=discord.Game(name=message))
-        except:
+        except Exception:
             log.info("Failed to change presence")
 
 

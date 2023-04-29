@@ -25,7 +25,7 @@ class WelcomeCog(discord.Cog):
                 member (discord.Member): The new member.
         """
         await webhook.send(
-            content=f"<a:Booyah:847300266566746153> {member.mention} joined **Splatfest!**\nCheck out <#761797254683164712>! <:splatfest:1024053687217295460> <:splatlove:1057108266062196827>",
+            content=f"<a:Booyah:847300266566746153> {member.mention} joined **Splatfest!**\nCheck out Anarchy Splatcast! <:splatfest:1024053687217295460> <:splatlove:1057108266062196827>",
             username=invisible_username,
             avatar_url="https://cdn.discordapp.com/attachments/1066917293935841340/1079624383410216970/Picsart_22-10-18_17-30-36-248.png",
         )

@@ -48,7 +48,7 @@ class ProfileEditor(discord.ui.Modal):
         ]):
             self.profile.__setattr__(v, self.children[i].value)
         db_handling.store(self.profile)
-        await interaction.response.send_message("✅ Profile updated.", embed=self.profile.embed())
+        await interaction.response.send_message("✅ Profile updated.", embed=self.profile.embed(), ephemeral=True)
             
 
 

@@ -5,7 +5,6 @@ import traceback
 from typing import Dict
 
 import discord
-import yaml
 from discord.ext import commands
 
 log = logging.getLogger(__name__)

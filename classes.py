@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from logging import LogRecord
 from typing import Callable, Dict, List
 import dateparser
+import persistent
 
 import discord
 import shortuuid
@@ -51,7 +52,7 @@ async def delay(duration: float, coroutine, **kwargs):
 
 
 @dataclass
-class Resource:
+class Resource(persistent.Persistent):
     id: str = field(default_factory=shortuuid.uuid, kw_only=True)
     owner_id: int  # The Discord user ID that owns this resource.
     created_at: datetime.datetime = field(

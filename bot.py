@@ -1,8 +1,11 @@
 import datetime
 import json
 import logging
+import traceback
+from typing import Dict
 
 import discord
+import yaml
 from discord.ext import commands
 
 log = logging.getLogger(__name__)
@@ -66,6 +69,11 @@ async def on_disconnect():
 @bot.event
 async def on_error(event, *args, **kwargs):
     log.exception(f'Uncaught exception in event "{event}"!')
+    await log_channel.send()
+
+@bot.event
+async def on_application_command(context:discord.ApplicationContext):
+    log.info(f'"{context.command.qualified_name}" invoked by {context.author} with args {context.options}')
 
 @bot.event
 async def on_application_command(context:discord.ApplicationContext):

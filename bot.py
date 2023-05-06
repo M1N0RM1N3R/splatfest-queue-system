@@ -11,7 +11,7 @@ log = logging.getLogger(__name__)
 
 config = json.load(open("config_beta.json"))
 
-bot = discord.Bot(debug_guilds=[config["guild"]], intents=discord.Intents(members=True))
+bot = discord.Bot(debug_guilds=[config["guild"]], intents=discord.Intents(members=True, guilds=True))
 
 guild = lambda: bot.get_guild(config["guild"])
 log_channel = lambda: bot.get_channel(config["log_channel"])
@@ -54,10 +54,6 @@ async def on_login():
 @bot.event
 async def on_ready():
     log.info("Ready!")
-    
-    for channel in bot.get_all_channels():
-        print("Go!")
-        print(channel)
 
 
 @bot.event
@@ -70,13 +66,12 @@ async def on_error(event, *args, **kwargs):
     log.exception(f'Uncaught exception in event "{event}"!')
     await log_channel.send()
 
-@bot.event
-async def on_application_command(context:discord.ApplicationContext):
-    log.info(f'"{context.command.qualified_name}" invoked by {context.author} with args {context.options}')
 
 @bot.event
-async def on_application_command(context:discord.ApplicationContext):
-    log.info(f'"{context.command.qualified_name}" invoked by {context.author} with args {context.options}')
+async def on_application_command(context: discord.ApplicationContext):
+    log.info(
+        f'"{context.command.qualified_name}" invoked by {context.author} with args {context.selected_options}'
+    )
 
 
 @bot.event
@@ -85,10 +80,19 @@ async def on_application_command_error(
 ):
     if isinstance(error, commands.CommandOnCooldown):
         await ctx.respond(
-            f"❌⏳ This command is on cooldown. Please try again <t:{datetime.datetime.now().timestamp() + error.retry_after}:R>."
+            f"❌⏳ This command is on cooldown. Please try again <t:{datetime.datetime.now().timestamp() + error.retry_after}:R>.",
+            ephemeral=True,
+        )
+    elif isinstance(error, commands.CheckFailure):
+        await ctx.respond(
+            f"⛔ {error.message or 'You do not have the proper permissions to use this command.'} If you believe you have received this message in error, please contact a server admin or <@547203725668646912> for assistance.",
+            ephemeral=True,
         )
     else:
         await ctx.respond(
             f"❌ Something went wrong on our end: {str(error)}", ephemeral=True
         )
-        log.exception(f'Uncaught exception in command "{ctx.command}"!', exc_info=(type(error), error, error.__traceback__))
+        log.exception(
+            f'Uncaught exception in command "{ctx.command}"!',
+            exc_info=(type(error), error, error.__traceback__),
+        )

@@ -1,6 +1,8 @@
 import logging
 from typing import Callable, Type
 
+import discord
+import transaction
 from ZODB import DB
 from ZODB.FileStorage import FileStorage
 
@@ -113,3 +115,8 @@ db = DB(storage)
 connection = db.open()
 db_root = connection.root()
 log.info("Database initialized")
+
+async def commit(bot: discord.Bot):
+    log.info("Committing changes to database...")
+    await bot.loop.run_in_executor(None, transaction.commit)
+    log.info("Done committing changes to database")

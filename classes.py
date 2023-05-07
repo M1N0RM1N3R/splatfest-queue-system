@@ -1,16 +1,15 @@
 import asyncio
 import datetime
+import json
 from dataclasses import dataclass, field
-from typing import Callable
+from typing import Callable, Dict
 
 import discord
 import persistent
 import shortuuid
 
-from bot import *
-
-config = json.load(open("config_beta.json"))
 secrets: Dict[str, str] = json.load(open("secrets.json"))
+config = json.load(open(secrets['config_file']))
 
 
 async def wait_for(

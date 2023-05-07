@@ -7,9 +7,10 @@ import traceback
 from typing import Dict
 import discord
 from discord.ext import commands
+from classes import secrets
 
 log = logging.getLogger(__name__)
-config = json.load(open("config_beta.json"))
+config = json.load(open(secrets['config_file']))
 bot = discord.Bot(
     debug_guilds=[config["guild"]], intents=discord.Intents(members=True, guilds=True)
 )

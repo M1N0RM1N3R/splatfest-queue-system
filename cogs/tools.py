@@ -1,8 +1,8 @@
 import logging
 import discord
 import random
-
 from classes import *
+from helpers.command_arg_types import timestamp
 
 log = logging.getLogger(__name__)
 
@@ -18,7 +18,6 @@ class ToolsCog(discord.Cog):
         self.bot = bot
 
     root = discord.SlashCommandGroup(name="tools", description="Very useful tools.")
-
     timestamp_types = [
         discord.OptionChoice(name=f"{k} ({v})", value=v)
         for k, v in {
@@ -39,7 +38,7 @@ class ToolsCog(discord.Cog):
     async def timestamp(
         self,
         ctx: discord.ApplicationContext,
-        when: iso8601_option("The date/time to convert."),
+        when: timestamp(description="The date/time to convert."),
         format: discord.Option(
             str,
             description="The type of timestamp to generate.",
@@ -47,18 +46,16 @@ class ToolsCog(discord.Cog):
         ),
         ephemeral: bool = True,
     ):
-        """Generate a Discord timestamp based on a specified date and time.
+        """Generates a Discord timestamp from a given date and time.
 
         Args:
-            when (datetime): The date/time to convert.
-            format (str enum, optional): The timestamp format to generate.
+            when (timestamp, optional): The date/time to convert.
+            format (enum, optional): The type of timestamp to generate.
             ephemeral (bool, optional): Whether to hide the result from other users. Defaults to True.
         """
-        await ctx.defer(ephemeral=ephemeral)
-        dt = datetime.datetime.fromisoformat(when)
-        result = f"<t:{int(dt.timestamp())}:{format}>".format(dt.timestamp())
-        await ctx.send_followup(
-            f"✅ {dt.isoformat()}: `{result}` (Preview: {result})", ephemeral=ephemeral
+        result = f"<t:{int(when.timestamp())}:{format}>".format(when.timestamp())
+        await ctx.send_response(
+            f"✅ {when.isoformat()}: `{result}` (Preview: {result})", ephemeral=ephemeral
         )
 
     @root.command(

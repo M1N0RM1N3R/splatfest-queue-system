@@ -2,7 +2,7 @@ import itertools
 import logging
 import random
 import subprocess
-from typing import Tuple
+from typing import List, Tuple
 
 import discord
 import discord.ext.commands as cmd

@@ -1,6 +1,10 @@
-from classes import db_root, Resource
 import logging
-from typing import Callable
+from typing import Callable, Type
+
+from ZODB import DB
+from ZODB.FileStorage import FileStorage
+
+from classes import Resource
 
 log = logging.getLogger(__name__)
 
@@ -37,7 +41,7 @@ def store(obj: Resource, upsert: bool = True):
             )
 
 
-def get(obj_type: str, id: str, none_if_missing: bool = True):
+def get(obj_type: Type[Resource], id: str, none_if_missing: bool = True) -> Resource:
     """Gets a resource based on its ID. Faster than using search().
 
     Args:
@@ -53,7 +57,7 @@ def get(obj_type: str, id: str, none_if_missing: bool = True):
     """
     log.debug(f"Getting {obj_type} object {id}, none_if_missing={none_if_missing}")
     try:
-        return db_root[obj_type][id]
+        return db_root[obj_type.__name__][id]
     except KeyError:
         if none_if_missing:
             return None
@@ -62,7 +66,7 @@ def get(obj_type: str, id: str, none_if_missing: bool = True):
 
 
 def search(
-    obj_type: str, cond: Callable[[Resource], bool], single_object: bool = True
+    obj_type: Type[Resource], cond: Callable[[Resource], bool], single_object: bool = True
 ) -> Resource | filter:
     """Searches for a given object type that satisfies a given condition.
 
@@ -83,7 +87,7 @@ def search(
         db_root[obj_type] = {}
         return None
     return (
-        next((v for v in db_root[obj_type].values() if cond(v)), None)
+        next((v for v in db_root[obj_type.__name__].values() if cond(v)), None)
         if single_object
         else filter(cond, table)
     )
@@ -103,3 +107,9 @@ def delete(obj_type: str, id: str):
         db_root[obj_type] = {}
         return
     del db_root[obj_type][id]
+
+storage = FileStorage("database.fs")
+db = DB(storage)
+connection = db.open()
+db_root = connection.root()
+log.info("Database initialized")

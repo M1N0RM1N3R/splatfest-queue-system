@@ -4,3 +4,5 @@ aiohttp
 dateparser
 shortuuid
 glicko2
+pytimeparse
+natural

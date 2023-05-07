@@ -1,20 +1,19 @@
+
+
 import datetime
 import json
 import logging
 import traceback
 from typing import Dict
-
 import discord
 from discord.ext import commands
 
 log = logging.getLogger(__name__)
-
 config = json.load(open("config_beta.json"))
-
-bot = discord.Bot(debug_guilds=[config["guild"]], intents=discord.Intents(members=True, guilds=True))
-
+bot = discord.Bot(
+    debug_guilds=[config["guild"]], intents=discord.Intents(members=True, guilds=True)
+)
 guild = lambda: bot.get_guild(config["guild"])
-log_channel = lambda: bot.get_channel(config["log_channel"])
 
 
 @bot.slash_command(name="ping", description="Check the bot's status.")
@@ -36,14 +35,19 @@ async def help(
                 if type(cmd) != discord.SlashCommandGroup
             ]
         ),
-        optional=False,
-    ),
+        default=None
+    )
 ):
     """You really need help with using the /help command? You just used it. Have an Easter egg: 🥚"""
-    await ctx.send_response(
-        f"> **{command}**\n{bot.get_application_command(command).callback.__doc__}",
-        ephemeral=True,
-    )
+    try: command = bot.get_application_command(command)
+    except AttributeError:
+        await ctx.send_response(f"""
+Hi there! My name is Kolkra. I'm an Octarian youth training to become a helpful assistant to everyone in the Splatfest server.
+If you want to learn more about what I can do, just ask me about one of my commands with {help.mention}, and I'll show you one of these descriptions from M1N3R about what it does and how to use it.
+""")
+    else:
+        await ctx.send_response(f"> **{command}**\n{command.callback.__doc__}", ephemeral=True)
+        
 
 
 @bot.event
@@ -64,7 +68,6 @@ async def on_disconnect():
 @bot.event
 async def on_error(event, *args, **kwargs):
     log.exception(f'Uncaught exception in event "{event}"!')
-    await log_channel.send()
 
 
 @bot.event
@@ -82,6 +85,10 @@ async def on_application_command_error(
         await ctx.respond(
             f"❌⏳ This command is on cooldown. Please try again <t:{datetime.datetime.now().timestamp() + error.retry_after}:R>.",
             ephemeral=True,
+        )
+    if isinstance(error, commands.BadArgument):
+        await ctx.respond(
+            f"❌⁉️ Could not parse an argument: {error.message}"
         )
     elif isinstance(error, commands.CheckFailure):
         await ctx.respond(

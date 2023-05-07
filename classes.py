@@ -1,16 +1,12 @@
 import asyncio
 import datetime
-import json
 from dataclasses import dataclass, field
-from logging import LogRecord
-from typing import Callable, Dict, List
-import dateparser
-import persistent
+from typing import Callable
 
 import discord
+import persistent
 import shortuuid
-from ZODB import DB
-from ZODB.FileStorage import FileStorage
+
 from bot import *
 
 config = json.load(open("config_beta.json"))
@@ -34,14 +30,6 @@ async def wait_for(
                 return False
         await asyncio.sleep(poll_interval)
 
-
-# setup the database
-print("Initializing database...", end="")
-storage = FileStorage("database.fs")
-db = DB(storage)
-connection = db.open()
-db_root = connection.root()
-print("DONE!")
 
 clean = discord.utils.escape_markdown
 
@@ -77,42 +65,3 @@ class Resource(persistent.Persistent):
             name != "updated_at"
         ):  # prevent setting updated_at from causing a recursive loop
             self.updated_at = datetime.datetime.now()
-
-
-def iso8601_option_autocomplete(actx: discord.AutocompleteContext) -> List[str]:
-    try:
-        return [dateparser.parse(actx.value).replace(microsecond=0).isoformat()]
-    except AttributeError:
-        return []
-
-
-def iso8601_option(desc):
-    return discord.Option(
-        str,
-        description=f"{desc} (Tip: I can format natural language!)",
-        autocomplete=iso8601_option_autocomplete,
-    )
-
-
-class DiscordLogHandler(logging.Handler):
-    def __init__(
-        self,
-        level=logging.NOTSET,
-    ):
-        super().__init__(level)
-
-    def emit(self, record: LogRecord) -> None:
-        embed = discord.Embed(title=f"{record.levelname} at {record.module}:{record.lineno} in {record.funcName}",description=clean(record.message),timestamp=datetime.datetime.fromtimestamp(record.created))
-
-        embed.set_thumbnail(
-            url={
-                "DEBUG": "https://cdn-icons-png.flaticon.com/512/2818/2818757.png",
-                "INFO": "https://cdn-icons-png.flaticon.com/512/1304/1304036.png",
-                "WARNING": "https://cdn-icons-png.flaticon.com/512/2684/2684750.png",
-                "ERROR": "https://cdn-icons-png.flaticon.com/512/2797/2797263.png",
-                "CRITICAL": "https://cdn-icons-png.flaticon.com/512/559/559375.png",
-            }[record.levelname]
-        )
-        if record.exc_text:
-            embed.add_field(name="Exception info", value=record.exc_text)
-        bot.loop.create_task(log_channel.send(embed=embed))

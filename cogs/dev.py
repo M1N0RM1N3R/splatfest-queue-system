@@ -48,7 +48,7 @@ class DevCog(discord.Cog):
             commit_id (str): The commit ID to update to. The commit must be on the main branch.
         """
         await ctx.defer(ephemeral=True)
-        await fetch_merge(ctx, commit_id)
+        await self.fetch_merge(ctx, commit_id)
         # Unload the old cogs
         for cog in list(self.bot.extensions.keys()):
             self.bot.unload_extension(cog)
@@ -96,7 +96,7 @@ class DevCog(discord.Cog):
             commit_id (str): The commit ID to update to. The commit must be on the main branch.
         """
         await ctx.defer(ephemeral=True)
-        await fetch_merge(ctx, commit_id)
+        await self.fetch_merge(ctx, commit_id)
         await ctx.send_followup("✅ Fetch-merge complete.", ephemeral=True)
         await self.restart_bot(ctx)
 

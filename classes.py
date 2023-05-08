@@ -7,6 +7,7 @@ from typing import Callable, Dict
 import discord
 import persistent
 import shortuuid
+from bot import bot
 
 secrets: Dict[str, str] = json.load(open("secrets.json"))
 config = json.load(open(secrets['config_file']))

@@ -1,10 +1,8 @@
 import logging
 import os
 import sys
-
 import discord
 from helpers.db_handling import commit, db
-
 from classes import *
 
 log = logging.getLogger(__name__)
@@ -14,23 +12,23 @@ async def is_owner(ctx: discord.ApplicationContext):
     return await ctx.bot.is_owner(ctx.user)
 
 
-async def fetch_merge(ctx, commit_id):
-    # Fetch and merge commit from GitHub
-    for cmd in ["git fetch origin main", f"git merge {commit_id}"]:
-        if exit_status := await self.bot.loop.run_in_executor(None, os.system, cmd):
-            raise OSError(
-                f"Failed to fetch-merge commit {commit_id}: {cmd} returned exit status {exit_status}"
-            )
-
-
 class DevCog(discord.Cog):
     def __init__(self, bot: discord.Bot):
         self.bot = bot
+
     root = discord.SlashCommandGroup(
         name="dev",
         description="Internal commands restricted to M1N3R only.",
         checks=[is_owner],
     )
+
+    async def fetch_merge(self, ctx, commit_id):
+        # Fetch and merge commit from GitHub
+        for cmd in ["git fetch origin main", f"git merge {commit_id}"]:
+            if exit_status := await self.bot.loop.run_in_executor(None, os.system, cmd):
+                raise OSError(
+                    f"Failed to fetch-merge commit {commit_id}: {cmd} returned exit status {exit_status}"
+                )
 
     @root.command(name="execute", description="Execute a script for debugging.")
     async def execute(self, ctx: discord.ApplicationContext, script: str):
@@ -46,7 +44,6 @@ class DevCog(discord.Cog):
     @root.command(name="hot-update", description="Update cogs without a cold start.")
     async def hot_update(self, ctx: discord.ApplicationContext, commit_id: str):
         """Automatically update Kolkra's cogs (command modules) without taking her offline entirely. Updates to code/config info outside of cogs requires a full update.
-
         Args:
             commit_id (str): The commit ID to update to. The commit must be on the main branch.
         """
@@ -74,9 +71,7 @@ class DevCog(discord.Cog):
 
     @root.command(name="restart")
     async def restart_bot(self, ctx: discord.ApplicationContext):
-        """Self-restart the bot.
-        """
-        
+        """Self-restart the bot."""
 
         log.warning("Bot is restarting!")
         await ctx.respond("🔽 See you on the other side.", ephemeral=True)
@@ -85,13 +80,10 @@ class DevCog(discord.Cog):
         db.close()
         for name in list(self.bot.extensions):
             self.bot.unload_extension(name)
-
         # https://stackoverflow.com/a/5758926
-
         args = sys.argv[:]
-
         args.insert(0, sys.executable)
-        if sys.platform == 'win32':
+        if sys.platform == "win32":
             args = ['"%s"' % arg for arg in args]
         os.execv(sys.executable, args)
 
@@ -100,15 +92,12 @@ class DevCog(discord.Cog):
     )
     async def full_update(self, ctx: discord.ApplicationContext, commit_id: str):
         """Update Kolkra's files, then self-restart.
-
         Args:
             commit_id (str): The commit ID to update to. The commit must be on the main branch.
         """
         await ctx.defer(ephemeral=True)
         await fetch_merge(ctx, commit_id)
-        await ctx.send_followup(
-            "✅ Fetch-merge complete.", ephemeral=True
-        )
+        await ctx.send_followup("✅ Fetch-merge complete.", ephemeral=True)
         await self.restart_bot(ctx)
 
 

@@ -24,8 +24,7 @@ class TimestampConverter(discord.ext.commands.Converter):
     async def convert(self, ctx, argument):
         if not (res := dateparser.parse(argument)):
             raise discord.ext.commands.BadArgument(f'Invalid/unknown format: "{argument}"')
-        res.microsecond = 0
-        return res
+        return res.replace(microsecond=0)
 
 def timestamp(**kwargs):
     return discord.Option(

@@ -1,5 +1,3 @@
-
-
 import datetime
 import json
 import logging
@@ -60,11 +58,6 @@ async def on_login():
 @bot.event
 async def on_ready():
     log.info("Ready!")
-
-
-@bot.event
-async def on_disconnect():
-    log.error("Lost connection to Discord!")
 
 
 @bot.event

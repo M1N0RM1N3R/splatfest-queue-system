@@ -1,5 +1,3 @@
-
-
 import datetime
 import json
 import logging
@@ -7,9 +5,10 @@ import traceback
 from typing import Dict
 import discord
 from discord.ext import commands
-from classes import secrets
 
 log = logging.getLogger(__name__)
+
+secrets: Dict[str, str] = json.load(open("secrets.json"))
 config = json.load(open(secrets['config_file']))
 bot = discord.Bot(
     debug_guilds=[config["guild"]], intents=discord.Intents(members=True, guilds=True)
@@ -65,11 +64,6 @@ async def on_login():
 @bot.event
 async def on_ready():
     log.info("Ready!")
-
-
-@bot.event
-async def on_disconnect():
-    log.error("Lost connection to Discord!")
 
 
 @bot.event

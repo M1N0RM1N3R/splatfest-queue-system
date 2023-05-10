@@ -22,6 +22,12 @@ async def ping(ctx):
     """Ensures that the bot is working properly, and shows the latency between the host and the Discord gateway."""
     await ctx.send_response(f"🏓 Pong! Latency: {int(bot.latency*1000)}ms.")
 
+def command_list():
+    result = ""
+    for cmd in bot.walk_application_commands():
+        if type(cmd) == discord.SlashCommand:
+            cmd: discord.SlashCommand
+            result += f"{cmd.mention} - {cmd.description}"
 
 @bot.slash_command(name="help", description="Show detailed help about a command.")
 async def help(

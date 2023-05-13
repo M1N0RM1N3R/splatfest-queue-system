@@ -5,7 +5,6 @@ from dataclasses import dataclass, field
 from typing import Callable, Dict
 
 import discord
-import persistent
 
 secrets: Dict[str, str] = json.load(open("secrets.json"))
 config = json.load(open(secrets['config_file']))

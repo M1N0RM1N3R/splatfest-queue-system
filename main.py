@@ -1,7 +1,6 @@
 import logging
 import os
 
-import transaction
 from discord.ext import tasks
 
 from bot import bot

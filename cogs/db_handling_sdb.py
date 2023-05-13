@@ -6,12 +6,15 @@ import json
 import logging
 from dataclasses import dataclass, field
 from typing import TypeVar
+from asyncio import get_event_loop
+
+import discord
 import shortuuid
 from jsonpickle import decode, encode
 from surrealdb import Surreal
-import discord
+
 from bot import bot
-from classes import secrets, config
+from classes import config, secrets
 
 log = logging.getLogger(__name__)
 
@@ -80,7 +83,7 @@ async def asetup():
     log.info("Database setup complete!")
 
 def setup(bot: discord.Bot):
-    t = bot.loop.create_task(asetup())
+    t = get_event_loop().run_until_complete(asetup())
 
 async def ateardown():
     global connection
@@ -89,7 +92,7 @@ async def ateardown():
     log.info("Database closed!")
 
 def teardown(bot: discord.Bot):
-    t = bot.loop.create_task(ateardown())
+    t = get_event_loop().run_until_complete(ateardown())
 
 R = TypeVar("R", bound=Resource)
 

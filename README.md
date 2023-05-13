@@ -12,12 +12,11 @@ Current features include:
   * In-game name
 
 Currently working on:
-* Migrating from ZODB to [SurrealDB](https://surrealdb.com/) for data storage
+* Automated LANarchy results submission and tracking
+* Session-based matchmaking system
 
 Planned features include:
-* Automated LANarchy results submission and tracking
 * Strike system (Moving away from vulnerable role-based system)
-* Session-based matchmaking system
 * Handling server custom Splatfests
 
 This repo is not necessarily intended for you to spin up your own instance. (if you really want to, live long and prosper) It's mainly intended to provide transparency into what makes the bot tick and to provide a quick and easy way to move updated code to production.

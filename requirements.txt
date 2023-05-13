@@ -1,4 +1,3 @@
-ZODB
 py-cord
 aiohttp
 dateparser
@@ -6,3 +5,5 @@ shortuuid
 glicko2
 pytimeparse
 natural
+jsonpickle
+surrealdb

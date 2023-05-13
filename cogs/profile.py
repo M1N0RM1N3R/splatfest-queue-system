@@ -1,9 +1,7 @@
 from dataclasses import dataclass
 import logging
-
 import discord
-from classes import Resource
-from helpers import db_handling
+from cogs.db_handling_sdb import run_query, Resource, NoResultError
 
 log = logging.getLogger(__name__)
 
@@ -29,11 +27,21 @@ class PlayerProfile(Resource):
 
 
 class ProfileEditor(discord.ui.Modal):
-    def __init__(self, user_id) -> None:
+    user_id: int
+
+    def __init__(self, user_id: int):
+        self.user_id = user_id
+
+    async def build(self) -> 'ProfileEditor':
         super().__init__(title="Profile Editor")
-        self.profile: PlayerProfile = db_handling.search(
-            PlayerProfile, cond=lambda x: x.owner_id == user_id
-        ) or PlayerProfile(user_id)
+        try:
+            self.profile: PlayerProfile = (await run_query(
+                PlayerProfile,
+                "SELECT * FROM PlayerProfile WHERE owner_id = $id",
+                id=self.user_id,
+            ))[0]
+        except IndexError:
+            self.profile = PlayerProfile(self.user_id)
         for field in [
             {
                 "label": "NSO Friend Code",
@@ -61,11 +69,12 @@ class ProfileEditor(discord.ui.Modal):
             },
         ]:
             self.add_item(discord.ui.InputText(**field, required=False))
+        return self
 
     async def callback(self, interaction: discord.Interaction):
         for i, v in enumerate(["friend_code", "main_lan_server", "xtag", "ign"]):
             self.profile.__setattr__(v, self.children[i].value)
-        db_handling.store(self.profile)
+        await self.profile.store()
         await interaction.response.send_message(
             "✅ Profile updated.", embed=self.profile.embed(), ephemeral=True
         )
@@ -82,7 +91,7 @@ class ProfileCog(discord.Cog):
     )
     async def edit(self, ctx: discord.ApplicationContext):
         """Edit the information in your player profile using the profile editor."""
-        await ctx.send_modal(ProfileEditor(ctx.author.id))
+        await ctx.send_modal(await ProfileEditor(ctx.author.id).build())
 
     @root.command(name="get", description="Check out your or someone else's profile.")
     async def get(
@@ -92,18 +101,21 @@ class ProfileCog(discord.Cog):
         ephemeral: bool = True,
     ):
         """Find the player profile for either yourself or another user.
-
         Args:
             user (Member, optional): The user to look up. Defaults to yourself.
             ephemeral (bool, optional): Whether to hide the result from other users. Defaults to True.
         """
         target = user or ctx.author
-        if profile := db_handling.search(
-            PlayerProfile, cond=lambda x: x.owner_id == target.id
-        ):
-            await ctx.send_response(embed=profile.embed(), ephemeral=ephemeral)
-        else:
+        try:
+            profile = (await run_query(
+                PlayerProfile,
+                "SELECT * FROM PlayerProfile WHERE owner_id = $id",
+                id=target.id,
+            ))[0]
+        except IndexError:
             await ctx.send_response("🫥 Player profile not found.", ephemeral=True)
+        else:
+            await ctx.send_response(embed=profile.embed(), ephemeral=ephemeral)
 
 
 def setup(bot: discord.Bot):

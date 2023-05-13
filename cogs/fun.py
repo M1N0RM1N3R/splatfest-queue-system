@@ -239,3 +239,6 @@ class FunCog(discord.Cog):
 def setup(bot: discord.Bot):
     bot.add_cog(FunCog(bot))
     log.info("Cog initialized")
+
+def teardown(bot:discord.Bot):
+    bot.get_cog('FunCog').motd.stop()

@@ -2,7 +2,7 @@ import logging
 import os
 import sys
 import discord
-from helpers.db_handling import commit, db
+from cogs.db_handling_sdb import ateardown as db_teardown
 from classes import *
 
 log = logging.getLogger(__name__)
@@ -76,8 +76,7 @@ class DevCog(discord.Cog):
         log.warning("Bot is restarting!")
         await ctx.respond("🔽 See you on the other side.", ephemeral=True)
         # Teardown tasks
-        await commit(self.bot)
-        db.close()
+        await db_teardown()
         for name in list(self.bot.extensions):
             self.bot.unload_extension(name)
         # https://stackoverflow.com/a/5758926

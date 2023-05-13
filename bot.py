@@ -5,6 +5,7 @@ import traceback
 from typing import Dict
 import discord
 from discord.ext import commands
+from discord.errors import CheckFailure
 
 log = logging.getLogger(__name__)
 
@@ -91,7 +92,7 @@ async def on_application_command_error(
         await ctx.respond(
             f"❌⁉️ Could not parse an argument: {error.message}"
         )
-    elif isinstance(error, commands.CheckFailure):
+    elif isinstance(error, CheckFailure):
         await ctx.respond(
             f"⛔ {error.message or 'You do not have the proper permissions to use this command.'} If you believe you have received this message in error, please contact a server admin or <@547203725668646912> for assistance.",
             ephemeral=True,

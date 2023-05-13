@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 import logging
 import discord
-from cogs.db_handling_sdb import run_query, Resource, NoResultError
+from helpers.db_handling_sdb import connection, Resource
 
 log = logging.getLogger(__name__)
 
@@ -32,14 +32,16 @@ class ProfileEditor(discord.ui.Modal):
     def __init__(self, user_id: int):
         self.user_id = user_id
 
-    async def build(self) -> 'ProfileEditor':
+    async def build(self) -> "ProfileEditor":
         super().__init__(title="Profile Editor")
         try:
-            self.profile: PlayerProfile = (await run_query(
-                PlayerProfile,
-                "SELECT * FROM PlayerProfile WHERE owner_id = $id",
-                id=self.user_id,
-            ))[0]
+            self.profile: PlayerProfile = (
+                await connection.run_query(
+                    PlayerProfile,
+                    "SELECT * FROM PlayerProfile WHERE owner_id = $id",
+                    id=self.user_id,
+                )
+            )[0]
         except IndexError:
             self.profile = PlayerProfile(self.user_id)
         for field in [
@@ -107,11 +109,13 @@ class ProfileCog(discord.Cog):
         """
         target = user or ctx.author
         try:
-            profile = (await run_query(
-                PlayerProfile,
-                "SELECT * FROM PlayerProfile WHERE owner_id = $id",
-                id=target.id,
-            ))[0]
+            profile = (
+                await connection.run_query(
+                    PlayerProfile,
+                    "SELECT * FROM PlayerProfile WHERE owner_id = $id",
+                    id=target.id,
+                )
+            )[0]
         except IndexError:
             await ctx.send_response("🫥 Player profile not found.", ephemeral=True)
         else:

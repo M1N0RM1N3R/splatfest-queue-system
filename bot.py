@@ -93,10 +93,8 @@ async def on_application_command_error(
             f"❌⁉️ Could not parse an argument: {error.message}"
         )
     elif isinstance(error, CheckFailure):
-        await ctx.respond(
-            f"⛔ {error.message or 'You do not have the proper permissions to use this command.'} If you believe you have received this message in error, please contact a server admin or <@547203725668646912> for assistance.",
-            ephemeral=True,
-        )
+        await ctx.respond("⛔ You do not have the proper permissions to use this command. If you believe you have received this message in error, please contact a server admin or <@547203725668646912> for assistance.", ephemeral=True)
+
     else:
         await ctx.respond(
             f"❌ Something went wrong on our end: {str(error)}", ephemeral=True

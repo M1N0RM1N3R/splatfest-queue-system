@@ -39,6 +39,7 @@ class DevCog(discord.Cog):
         output = eval(script) or "✅"
         if asyncio.isfuture(output):
             output = await output
+        output = str(output)
         for i in range(0, len(output), 2000):
             await ctx.send_followup(output[i : i + 2000], ephemeral=True)
 

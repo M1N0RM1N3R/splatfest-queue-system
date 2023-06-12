@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 secrets: Dict[str, str] = json.load(open("secrets.json"))
 config = json.load(open(secrets['config_file']))
 bot = discord.Bot(
-    debug_guilds=[config["guild"]], intents=discord.Intents(members=True, guilds=True)
+    debug_guilds=[config["guild"]], intents=discord.Intents(members=True, guilds=True, messages=True)
 )
 guild = lambda: bot.get_guild(config["guild"])
 

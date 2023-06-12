@@ -36,7 +36,9 @@ class DevCog(discord.Cog):
             script (str): The Python script to execute.
         """
         await ctx.defer(ephemeral=True)
-        output = str(eval(script) or "✅")
+        output = eval(script) or "✅"
+        if asyncio.isfuture(output):
+            output = await output
         for i in range(0, len(output), 2000):
             await ctx.send_followup(output[i : i + 2000], ephemeral=True)
 

@@ -3,5 +3,9 @@
     "log_channel": 1075221663823704135,
     "announcements_channel": 1075221042529828900,
     "mod_role": 1075222819153133700,
-    "admin_role": 1075222884487790700
+    "admin_role": 1075222884487790700,
+    "captcha": {
+        "unverified_role": 1112894789541707859,
+        "verification_channel": 1112895218652549221
+    }
 }

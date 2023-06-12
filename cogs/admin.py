@@ -1,18 +1,13 @@
 import logging
 import os
 import discord
+from helpers.command_checks import is_admin_or_dev
 
 
 from classes import *
 
 
 log = logging.getLogger(__name__)
-
-
-async def is_admin_or_dev(ctx: discord.ApplicationContext):
-    return await ctx.author.get_role(config["admin_role"]) or await ctx.bot.is_owner(
-        ctx.user
-    )
 
 
 class AdminCog(discord.Cog):

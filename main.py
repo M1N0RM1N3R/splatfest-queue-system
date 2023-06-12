@@ -7,7 +7,7 @@ from bot import bot
 from classes import *
 from helpers.discord_logger import DiscordLogHandler
 
-logging.basicConfig(level=logging.INFO, format="[%(asctime)s] %(levelname)s %(module)s:%(lineno)d   %(message)s")
+logging.basicConfig(level=logging.DEBUG, format="[%(asctime)s] %(levelname)s %(module)s:%(lineno)d   %(message)s")
 logging.getLogger().addHandler(DiscordLogHandler(bot, config['log_channel'], level=logging.WARNING))
 log = logging.getLogger(__name__)
 

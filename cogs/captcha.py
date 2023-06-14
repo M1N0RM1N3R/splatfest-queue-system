@@ -94,6 +94,9 @@ class StartView(discord.ui.View):
                     )
 
 
+prompt_generated: list[int] = []  # list of user IDs that have prompts already generated
+
+
 class CaptchaCog(discord.Cog):
     def __init__(self, bot: discord.Bot) -> None:
         self.bot = bot
@@ -106,9 +109,12 @@ class CaptchaCog(discord.Cog):
     @cmd.Cog.listener()
     async def on_member_join(self, member: discord.Member):
         """Fires when a new member joins the server.
+
         Args:
-                member (discord.Member): The new member.
+            member (discord.Member): The new member.
         """
+        global prompt_generated
+        prompt_generated.append(member.id)
         await member.add_roles(
             unverified_role(self.bot), reason="Starting verification"
         )
@@ -120,6 +126,7 @@ class CaptchaCog(discord.Cog):
     @root.command(checks=[is_admin_or_dev])
     async def verify(self, ctx: discord.ApplicationContext, member: discord.Member):
         """Manually put a member through verification, or regenerate the prompt after a restart.
+
         Args:
             member (discord.Member): The member to verify.
         """
@@ -127,6 +134,20 @@ class CaptchaCog(discord.Cog):
         await ctx.send_response(
             f"✅ Started verification for {member.mention}.", ephemeral=True
         )
+
+    @root.command()
+    async def regenerate(self, ctx: discord.ApplicationContext):
+        """Manually regenerate your verification prompt, in case of a bot restart."""
+        global prompt_generated
+        if not ctx.author.get_role(config["captcha"]["unverified_role"]):
+            await ctx.send_response("❌ You're already verified!", ephemeral=True)
+        elif ctx.author.id in prompt_generated:
+            await ctx.send_response(
+                "❌ Your prompt has already been generated!", ephemeral=True
+            )
+        else:
+            await self.on_member_join(ctx.author)
+            await ctx.send_response("✅ Prompt regenerated.", ephemeral=True)
 
 
 def setup(bot: discord.Bot):

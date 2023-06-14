@@ -3,6 +3,7 @@ import os
 import sys
 import discord
 from classes import *
+from aiohttp import client
 
 log = logging.getLogger(__name__)
 
@@ -40,8 +41,22 @@ class DevCog(discord.Cog):
         if asyncio.isfuture(output):
             output = await output
         output = str(output)
-        for i in range(0, len(output), 2000):
-            await ctx.send_followup(output[i : i + 2000], ephemeral=True)
+        if len(output) > 2000: # If the response is too long, upload it to Hastebin and return a link to the uploaded text.
+            async with client.ClientSession() as session:
+                async with session.post(
+                    "https://hastebin.com/documents",
+                    data=output,
+                    headers={
+                        "content-type": "text/plain",
+                        "Authorization": f"Bearer {secrets['hastebin_token']}"
+                    },
+                    raise_for_status=True
+                ) as response:
+                    paste_id = (await response.json())["key"]
+            await ctx.send_followup(f"📤 Result uploaded to https://hastebin.com/share/{paste_id}.", ephemeral=True)
+        else:
+            await ctx.send_followup(output, ephemeral=True)
+                
 
     @root.command(name="hot-update", description="Update cogs without a cold start.")
     async def hot_update(self, ctx: discord.ApplicationContext, commit_id: str):

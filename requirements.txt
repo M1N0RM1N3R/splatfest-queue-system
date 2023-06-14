@@ -7,3 +7,5 @@ pytimeparse
 natural
 jsonpickle
 surrealdb
+captcha
+requests

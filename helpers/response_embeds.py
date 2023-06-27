@@ -1,5 +1,6 @@
 from discord import Embed, Color
 from dataclasses import dataclass
+from enum import Enum
 
 
 @dataclass

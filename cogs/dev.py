@@ -57,7 +57,7 @@ class DevCog(discord.Cog):
                 ) as response:
                     paste_id = (await response.json())["key"]
             await ctx.send_followup(
-                embed=EmbedStyle.Ok.embed(
+                embed=EmbedStyle.Ok.value.embed(
                     title="Output uploaded to Hastebin",
                     description="The output of this script is over 4,000 characters, so it was uploaded to Hastebin.",
                 ).add_field(
@@ -68,7 +68,7 @@ class DevCog(discord.Cog):
             )
         else:
             await ctx.send_followup(
-                embed=EmbedStyle.Ok.embed(title="Script output", description=output),
+                embed=EmbedStyle.Ok.value.embed(title="Script output", description=output),
                 ephemeral=True,
             )
 
@@ -95,13 +95,13 @@ class DevCog(discord.Cog):
         if errors:
             error_list = "\n".join([f"- {k}: {v}" for k, v in errors.items()])
             return await ctx.send_followup(
-                embed=EmbedStyle.Warning.embed(
+                embed=EmbedStyle.Warning.value.embed(
                     title="Cog reloading failed", description=error_list
                 )
             )
         else:
             return await ctx.send_followup(
-                embed=EmbedStyle.Ok.embed(description="All cogs updated successfully.")
+                embed=EmbedStyle.Ok.value.embed(description="All cogs updated successfully.")
             )
 
     @root.command(name="restart")
@@ -110,7 +110,7 @@ class DevCog(discord.Cog):
 
         log.warning("Bot is restarting!")
         await ctx.respond(
-            embed=EmbedStyle.Ok.embed(title="Restarting..."), ephemeral=True
+            embed=EmbedStyle.Ok.value.embed(title="Restarting..."), ephemeral=True
         )
         # Teardown tasks
         for name in list(self.bot.extensions):
@@ -133,7 +133,7 @@ class DevCog(discord.Cog):
         await ctx.defer(ephemeral=True)
         await self.fetch_merge(ctx, commit_id)
         await ctx.send_followup(
-            embed=EmbedStyle.Ok.embed(description="Fetch-merge complete."),
+            embed=EmbedStyle.Ok.value.embed(description="Fetch-merge complete."),
             ephemeral=True,
         )
         await self.restart_bot(ctx)

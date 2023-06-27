@@ -29,7 +29,7 @@ class StartView(discord.ui.View):
     async def start(self, button: discord.ui.Button, interaction: discord.Interaction):
         if interaction.user.id != self.member.id:
             await interaction.response.send_message(
-                embed=EmbedStyle.AccessDenied.embed(
+                embed=EmbedStyle.AccessDenied.value.embed(
                     title="Cannot verify others",
                     description=f"You can't start verification for someone else! Please find and use your own verification prompt, or regenerate it with {self.bot.get_command('captcha regenerate').mention}.",
                 ),
@@ -37,7 +37,7 @@ class StartView(discord.ui.View):
             )
         elif not interaction.user.get_role(config["captcha"]["unverified_role"]):
             await interaction.response.send_message(
-                embed=EmbedStyle.Ok.embed(
+                embed=EmbedStyle.Ok.value.embed(
                     title="Already verified",
                     description="Looks like you've already passed verification!",
                 ),
@@ -45,7 +45,7 @@ class StartView(discord.ui.View):
             )
         elif self.cooldown_until > datetime.datetime.now():
             await interaction.response.send_message(
-                embed=EmbedStyle.Wait.embed(
+                embed=EmbedStyle.Wait.value.embed(
                     description="You can't start verification right now!",
                 ).add_field(
                     name="Retry", value=f"<t:{int(self.cooldown_until.timestamp())}:R>"
@@ -64,19 +64,19 @@ class StartView(discord.ui.View):
             # Send the captcha image
             try:
                 await self.member.send(
-                    embed=EmbedStyle.Question.embed(
+                    embed=EmbedStyle.Question.value.embed(
                         title="Solve the CAPTCHA!",
-                        description="Please enter the text displayed in the CAPTCHA image below.",
+                        description="Please enter the text displayed in the attached CAPTCHA image.",
                     )
-                    .set_image(discord.File(captcha, filename="captcha.png"))
                     .add_field(
                         name="Timeout",
                         value=f"<t:{int(datetime.datetime.now().timestamp()) + 120}:R>",
                     ),
+                    file=discord.File(captcha, filename="captcha.png")
                 )
             except discord.Forbidden:
                 await interaction.response.send_message(
-                    embed=EmbedStyle.Error.embed(
+                    embed=EmbedStyle.Error.value.embed(
                         description="I can't send you DMs! Please allow DMs from server members, then try again.",
                     ),
                     ephemeral=True,
@@ -86,7 +86,7 @@ class StartView(discord.ui.View):
                     minutes=2
                 )
                 await interaction.response.send_message(
-                    embed=EmbedStyle.Info.embed(
+                    embed=EmbedStyle.Info.value.embed(
                         title="CAPTCHA sent",
                         description="I just sent you a DM with further instructions.",
                     ),
@@ -102,7 +102,7 @@ class StartView(discord.ui.View):
                     )
                 except asyncio.TimeoutError:
                     await interaction.response.send_message(
-                        embed=EmbedStyle.Error.embed(
+                        embed=EmbedStyle.Error.value.embed(
                             title="Timed out",
                             description="You didn't respond in time! Please try again.",
                         ),
@@ -114,13 +114,13 @@ class StartView(discord.ui.View):
                         reason="Verification passed",
                     )
                     await self.member.send(
-                        embed=EmbedStyle.Ok.embed(
+                        embed=EmbedStyle.Ok.value.embed(
                             description="You've passed verification! You're ready to fest now.",
                         )
                     )
                 else:
                     await self.member.send(
-                        embed=EmbedStyle.Error.embed(
+                        embed=EmbedStyle.Error.value.embed(
                             title="Verification failed",
                             description="You entered an incorrect response. You may try again when the current CAPTCHA times out.",
                         )
@@ -153,7 +153,7 @@ class CaptchaCog(discord.Cog):
         )
         await self.bot.get_channel(config["captcha"]["verification_channel"]).send(
             member.mention,
-            embed=EmbedStyle.Question.embed(
+            embed=EmbedStyle.Question.value.embed(
                 title="Verification required",
                 description=f"Welcome to Splatfest, {member.mention}! I just need to make sure that you're not a bot. Click the button below to begin the verification process.",
             ),
@@ -169,7 +169,7 @@ class CaptchaCog(discord.Cog):
         """
         await self.on_member_join(member)
         await ctx.send_response(
-            embed=EmbedStyle.Ok.embed(
+            embed=EmbedStyle.Ok.value.embed(
                 description=f"Started verification for {member.mention}."
             ),
             ephemeral=True,
@@ -181,7 +181,7 @@ class CaptchaCog(discord.Cog):
         global prompt_generated
         if not ctx.author.get_role(config["captcha"]["unverified_role"]):
             await ctx.send_response(
-                embed=EmbedStyle.Ok.embed(
+                embed=EmbedStyle.Ok.value.embed(
                     title="Already verified",
                     description="You're already verified! You don't need to regenerate your prompt.",
                 ),
@@ -189,7 +189,7 @@ class CaptchaCog(discord.Cog):
             )
         elif ctx.author.id in prompt_generated:
             await ctx.send_response(
-                embed=EmbedStyle.Error.embed(
+                embed=EmbedStyle.Error.value.embed(
                     description="Your prompt has already been generated!",
                 ),
                 ephemeral=True,
@@ -197,7 +197,7 @@ class CaptchaCog(discord.Cog):
         else:
             await self.on_member_join(ctx.author)
             await ctx.send_response(
-                embed=EmbedStyle.Ok.embed(description="Prompt regenerated."),
+                embed=EmbedStyle.Ok.value.embed(description="Prompt regenerated."),
                 ephemeral=True,
             )
 

@@ -8,12 +8,14 @@ log = logging.getLogger(__name__)
 
 @dataclass
 class PlayerProfile(Resource):
+    owner_id: int  # The Discord user ID that owns this resource.
     friend_code: str = None
     main_lan_server: str = None
     xtag: str = None
     ign: str = None
 
-    def embed(self):
+    def embed(self, bot: discord.Bot):
+        user = bot.get_guild(config["guild"]).get_member(self.owner_id)
         embed = super().embed(
             {
                 "NSO Friend Code": self.friend_code,
@@ -21,16 +23,18 @@ class PlayerProfile(Resource):
                 "XLink Kai username": self.xtag,
                 "In-game name": self.ign,
             }
-        )
+        ).set_author(name=user.display_name, icon_url=user.display_avatar)
         embed.title = "Player Info"
         return embed
 
 
 class ProfileEditor(discord.ui.Modal):
     user_id: int
+    bot: discord.Bot
 
-    def __init__(self, user_id: int):
+    def __init__(self, user_id: int, bot: discord.Bot):
         self.user_id = user_id
+        self.bot = bot
 
     async def build(self) -> "ProfileEditor":
         super().__init__(title="Profile Editor")
@@ -78,7 +82,7 @@ class ProfileEditor(discord.ui.Modal):
             self.profile.__setattr__(v, self.children[i].value)
         await self.profile.store()
         await interaction.response.send_message(
-            "✅ Profile updated.", embed=self.profile.embed(), ephemeral=True
+            "✅ Profile updated.", embed=self.profile.embed(self.bot), ephemeral=True
         )
 
 
@@ -93,19 +97,19 @@ class ProfileCog(discord.Cog):
     )
     async def edit(self, ctx: discord.ApplicationContext):
         """Edit the information in your player profile using the profile editor."""
-        await ctx.send_modal(await ProfileEditor(ctx.author.id).build())
+        await ctx.send_modal(await ProfileEditor(ctx.author.id, self.bot).build())
 
     @root.command(name="get", description="Check out your or someone else's profile.")
     async def get(
         self,
         ctx: discord.ApplicationContext,
         user: discord.Member = None,
-        ephemeral: bool = True,
+        ephemeral: bool = False,
     ):
         """Find the player profile for either yourself or another user.
         Args:
             user (Member, optional): The user to look up. Defaults to yourself.
-            ephemeral (bool, optional): Whether to hide the result from other users. Defaults to True.
+            ephemeral (bool, optional): Whether to hide the result from other users. Defaults to False.
         """
         target = user or ctx.author
         try:
@@ -119,7 +123,7 @@ class ProfileCog(discord.Cog):
         except IndexError:
             await ctx.send_response("🫥 Player profile not found.", ephemeral=True)
         else:
-            await ctx.send_response(embed=profile.embed(), ephemeral=ephemeral)
+            await ctx.send_response(embed=profile.embed(self.bot), ephemeral=ephemeral)
 
 
 def setup(bot: discord.Bot):

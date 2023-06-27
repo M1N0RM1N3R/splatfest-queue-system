@@ -11,7 +11,6 @@ from shortuuid import uuid
 from surrealdb import Surreal
 from surrealdb.ws import ConnectionState
 
-from bot import bot
 from classes import config, secrets
 
 log = logging.getLogger(__name__)
@@ -86,7 +85,6 @@ class Resource:
     id: str = field(
         default=None, kw_only=True
     )  # Unique SurrealDB-formatted record ID. Generated post-init if not provided.
-    owner_id: int  # The Discord user ID that owns this resource.
     created_at: datetime.datetime = field(
         default_factory=datetime.datetime.now, kw_only=True
     )
@@ -97,11 +95,9 @@ class Resource:
             self.id = f"{self.__class__.__name__}:{uuid()}"
 
     def embed(self, fields: dict[str, str]):
-        user = bot.get_guild(config["guild"]).get_member(self.owner_id)
         embed = (
             discord.Embed(title=self.__class__.__name__)
             .set_footer(text=f"ID: {self.id} | Made with 💚 by M1N3R")
-            .set_author(name=user.display_name, icon_url=user.display_avatar)
         )
         for k, v in fields.items():
             embed.add_field(name=k, value=v)

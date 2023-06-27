@@ -25,10 +25,10 @@ async def ping(ctx):
     """Ensures that the bot is working properly, and shows the system latency."""
     global last_ready_time
     await ctx.send_response(
-        embed=EmbedStyle.Ok.embed(title="Pong!")
+        embed=EmbedStyle.Ok.value.embed(title="Pong!")
         .add_field(name="Discord latency", value=f"{int(bot.latency*1000)}ms")
-        .add_field(name="Database latency", value=f"{int(db_connection.connection.ws.latency*1000)}ms")
-        .add_field(name="Last Ready event", value=f"<t:{int(last_ready_time)}>"),
+        .add_field(name="Database latency", value=f"{int(db_connection.connection.ws.latency*1000)}ms" if db_connection.connection else "Not initialized")
+        .add_field(name="Last Ready event", value=f"<t:{int(last_ready_time.timestamp())}>"),
         ephemeral=True,
     )
 
@@ -54,7 +54,7 @@ async def help(
         command = bot.get_application_command(command)
     except AttributeError:
         await ctx.send_response(
-            embed=EmbedStyle.Info.embed(
+            embed=EmbedStyle.Info.value.embed(
                 title="About Kolkra",
                 description="Kolkra is Splatfest's official custom Discord bot, developed and maintained by <@547203725668646912> to help automate server-specific processes.",
             ),
@@ -62,7 +62,7 @@ async def help(
         )
     else:
         await ctx.send_response(
-            embed=EmbedStyle.Info.embed(
+            embed=EmbedStyle.Info.value.embed(
                 title=f"Command info: {command.mention}",
                 description=command.callback.__doc__,
             ),
@@ -100,7 +100,7 @@ async def on_application_command_error(
 ):
     if isinstance(error, commands.CommandOnCooldown):
         await ctx.respond(
-            embed=EmbedStyle.Wait.embed(
+            embed=EmbedStyle.Wait.value.embed(
                 title="Command on cooldown",
                 description="Your use of this command is being rate limited.",
             ).add_field(
@@ -110,14 +110,14 @@ async def on_application_command_error(
         )
     if isinstance(error, commands.BadArgument):
         await ctx.respond(
-            embed=EmbedStyle.Warning.embed(
+            embed=EmbedStyle.Warning.value.embed(
                 title="Bad argument",
                 description="An argument could not be parsed successfully.",
             )
         )
     elif isinstance(error, CheckFailure):
         await ctx.respond(
-            embed=EmbedStyle.AccessDenied.embed(
+            embed=EmbedStyle.AccessDenied.value.embed(
                 title="Command check(s) failed",
                 description="A required check has failed while attempting to execute this command. This may be because you do not have the required permissions to execute the command.",
             ),
@@ -126,7 +126,7 @@ async def on_application_command_error(
 
     else:
         await ctx.respond(
-            embed=EmbedStyle.Error.embed(title="Internal error", description=str(error)), ephemeral=True
+            embed=EmbedStyle.Error.value.embed(title="Internal error", description=str(error)), ephemeral=True
         )
         log.exception(
             f'Uncaught exception in command "{ctx.command}"!',

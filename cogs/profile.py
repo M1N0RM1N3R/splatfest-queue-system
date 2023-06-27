@@ -2,6 +2,7 @@ from dataclasses import dataclass
 import logging
 import discord
 from helpers.db_handling_sdb import connection, Resource
+from classes import config
 
 log = logging.getLogger(__name__)
 

@@ -3,49 +3,70 @@ import json
 import logging
 import traceback
 from typing import Dict
+
 import discord
-from discord.ext import commands
 from discord.errors import CheckFailure
-from helpers.response_embeds import EmbedStyle
+from discord.ext import commands
+from docstring_parser.google import parse as parse_docstring
+
 from helpers.db_handling_sdb import connection as db_connection
+from helpers.embed_templates import EmbedStyle
+from classes import config, secrets
 
 log = logging.getLogger(__name__)
 
-secrets: Dict[str, str] = json.load(open("secrets.json"))
-config = json.load(open(secrets["config_file"]))
+#secrets: Dict[str, str] = json.load(open("secrets.json"))
+#config = json.load(open(secrets["config_file"]))
 bot = discord.Bot(
     debug_guilds=[config["guild"]],
-    intents=discord.Intents(members=True, guilds=True, messages=True),
+    intents=discord.Intents(
+        members=True, guilds=True, messages=True, message_content=True, reactions=True
+    ),
 )
 guild = lambda: bot.get_guild(config["guild"])
 
 
-@bot.slash_command(description="Check the bot's status.")
+@bot.slash_command()
 async def ping(ctx):
     """Ensures that the bot is working properly, and shows the system latency."""
     global last_ready_time
-    await ctx.send_response(
+    await ctx.respond(
         embed=EmbedStyle.Ok.value.embed(title="Pong!")
         .add_field(name="Discord latency", value=f"{int(bot.latency*1000)}ms")
-        .add_field(name="Database latency", value=f"{int(db_connection.connection.ws.latency*1000)}ms" if db_connection.connection else "Not initialized")
-        .add_field(name="Last Ready event", value=f"<t:{int(last_ready_time.timestamp())}>"),
+        .add_field(
+            name="Database latency",
+            value=f"{int(db_connection.connection.ws.latency*1000)}ms"
+            if db_connection.connection
+            else "Not initialized",
+        )
+        .add_field(
+            name="Last Ready event", value=discord.utils.format_dt(last_ready_time)
+        ),
         ephemeral=True,
     )
 
 
-@bot.slash_command(name="help", description="Show detailed help about a command.")
+async def _cmd_list(ctx: discord.AutocompleteContext):
+    async def can_run(cmd, ctx):
+        try:
+            return await cmd.can_run(ctx)
+        except Exception:
+            return False
+
+    return [
+        cmd.qualified_name
+        for cmd in bot.walk_application_commands()
+        if type(cmd) == discord.SlashCommand and await can_run(cmd, ctx)
+    ]
+
+
+@bot.slash_command(name="help", description="Show detailed info about a command.")
 async def help(
     ctx,
     command=discord.Option(
         str,
         description="The command to get help for.",
-        autocomplete=discord.utils.basic_autocomplete(
-            lambda ctx: [
-                cmd.qualified_name
-                for cmd in bot.walk_application_commands()
-                if type(cmd) != discord.SlashCommandGroup
-            ]
-        ),
+        autocomplete=discord.utils.basic_autocomplete(_cmd_list),
         default=None,
     ),
 ):
@@ -53,7 +74,7 @@ async def help(
     try:
         command = bot.get_application_command(command)
     except AttributeError:
-        await ctx.send_response(
+        await ctx.respond(
             embed=EmbedStyle.Info.value.embed(
                 title="About Kolkra",
                 description="Kolkra is Splatfest's official custom Discord bot, developed and maintained by <@547203725668646912> to help automate server-specific processes.",
@@ -61,11 +82,18 @@ async def help(
             ephemeral=True,
         )
     else:
-        await ctx.send_response(
-            embed=EmbedStyle.Info.value.embed(
-                title=f"Command info: {command.mention}",
-                description=command.callback.__doc__,
-            ),
+        parsed = parse_docstring(command.callback.__doc__)
+        embed = EmbedStyle.Info.value.embed(
+            title=f"Command info: {command.mention}",
+            description=parsed.short_description,
+        )
+        for arg in parsed.params:
+            embed.add_field(
+                name=f"Arg: {arg.arg_name} ({arg.type_name})",
+                value=f"{arg.description}",
+            )
+        await ctx.respond(
+            embed=embed,
             ephemeral=True,
         )
 
@@ -99,34 +127,38 @@ async def on_application_command_error(
     ctx: discord.ApplicationContext, error: discord.DiscordException
 ):
     if isinstance(error, commands.CommandOnCooldown):
+        error: commands.CommandOnCooldown
         await ctx.respond(
             embed=EmbedStyle.Wait.value.embed(
                 title="Command on cooldown",
                 description="Your use of this command is being rate limited.",
             ).add_field(
                 name="Retry",
-                value=f"<t:{int(datetime.datetime.now().timestamp() + error.retry_after)}:R>",
-            )
-        )
-    if isinstance(error, commands.BadArgument):
-        await ctx.respond(
-            embed=EmbedStyle.Warning.value.embed(
-                title="Bad argument",
-                description="An argument could not be parsed successfully.",
-            )
-        )
-    elif isinstance(error, CheckFailure):
-        await ctx.respond(
-            embed=EmbedStyle.AccessDenied.value.embed(
-                title="Command check(s) failed",
-                description="A required check has failed while attempting to execute this command. This may be because you do not have the required permissions to execute the command.",
+                value=discord.utils.format_dt(
+                    datetime.datetime.now()
+                    + datetime.timedelta(seconds=error.retry_after)
+                ),
             ),
             ephemeral=True,
         )
-
+    elif isinstance(error, commands.BadArgument):
+        error: commands.BadArgument
+        await ctx.respond(
+            embed=EmbedStyle.Warning.value.embed(
+                title="Bad argument",
+                description=error.message,
+            )
+        )
+    elif isinstance(
+        error, CheckFailure
+    ):  # Do nothing on check failure--our custom checks in helpers.command_checks and elsewhere return their own error messages
+        return
     else:
         await ctx.respond(
-            embed=EmbedStyle.Error.value.embed(title="Internal error", description=str(error)), ephemeral=True
+            embed=EmbedStyle.Error.value.embed(
+                title="Internal error", description=str(error)
+            ),
+            ephemeral=True,
         )
         log.exception(
             f'Uncaught exception in command "{ctx.command}"!',

@@ -24,6 +24,7 @@ class WelcomeCog(discord.Cog):
         Args:
                 member (discord.Member): The new member.
         """
+        global webhook
         await webhook.send(
             content=f"<a:Booyah:847300266566746153> {member.mention} joined **Splatfest!**\nCheck out Anarchy Splatcast! <:splatfest:1024053687217295460> <:splatlove:1057108266062196827>",
             username=invisible_username,
@@ -37,6 +38,7 @@ class WelcomeCog(discord.Cog):
         Args:
                 member (discord.Member): The member that just left.
         """
+        global webhook
         await webhook.send(
             content=f"<a:Ouch:847300319071043604> {member} just left **Splatfest...**\n<a:1member:803768545816084480> <:splatbroke:1057109111097004103>",
             username=invisible_username,
@@ -44,15 +46,17 @@ class WelcomeCog(discord.Cog):
         )
 
 
+webhook = discord.Webhook.from_url(
+    secrets["welcome_webhook"], session=aiohttp.ClientSession()
+)
+
+
 def setup(bot: discord.Bot):
     bot.add_cog(WelcomeCog(bot))
-    global webhook
-    webhook = discord.Webhook.from_url(
-        secrets["welcome_webhook"], session=aiohttp.ClientSession()
-    )
     log.info("Cog initialized")
 
 
 def teardown(bot: discord.Bot):
-    asyncio.get_event_loop().run_until_complete(webhook.session.close())
+    global webhook
+    bot.loop.run_until_complete(webhook.session.close())
     log.info("Cog closed")

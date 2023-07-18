@@ -10,6 +10,7 @@ Current features include:
   * Preferred classic LAN play server
   * XLink Kai username (XTag)
   * In-game name
+* Automatic bot screening system
 
 Currently working on:
 * Automated LANarchy results submission and tracking

@@ -2,7 +2,7 @@ import itertools
 import logging
 import random
 import subprocess
-from typing import List, Tuple
+from typing import Optional, List, Tuple
 
 import discord
 import discord.ext.commands as cmd
@@ -158,7 +158,7 @@ class ChallengeView(discord.ui.View):
     def __init__(
         self,
         challenger: discord.Member,
-        opponent: discord.Member = None,
+        opponent: Optional[discord.Member] = None,
         game_type=GameBoard,
     ):
         super().__init__()
@@ -200,11 +200,12 @@ class FunCog(discord.Cog):
 
     @cmd.Cog.listener()
     async def on_ready(self):
-        self.motd.start()
+        if not self.motd.is_running():
+            self.motd.start()
 
     @root.command(name="tickoat2", description="Play a game of TickoaTTwo.")
     async def tickoat2(
-        self, ctx: discord.ApplicationContext, opponent: discord.Member = None
+        self, ctx: discord.ApplicationContext, opponent: Optional[discord.Member] = None
     ):
         """Challenge someone to a game of TickoaTTwo, a two-player pen-and-paper style game based on tic-tac-toe. Place the last stroke in a line of 3 crosses to win!
 
@@ -213,7 +214,7 @@ class FunCog(discord.Cog):
             opponent (Member): The player you want to challenge. Your opponent must accept your challenge before the game will begin. Defaults to an open challenge that anyone can accept.
         """
         challenge = ChallengeView(ctx.author, opponent, To2Board)
-        challenge_msg = await ctx.send_response(f"⚔️ {opponent.mention} You have been challenged to a game of TickoaTTwo by {ctx.author.mention}!" if opponent else f"⚔️ {ctx.author.mention} is looking for an opponent to play TickoaTTwo!", view=challenge, embed=challenge.embed())
+        challenge_msg = await ctx.respond(f"⚔️ {opponent.mention} You have been challenged to a game of TickoaTTwo by {ctx.author.mention}!" if opponent else f"⚔️ {ctx.author.mention} is looking for an opponent to play TickoaTTwo!", view=challenge, embed=challenge.embed())
         if await challenge.wait():
             await challenge_msg.edit_original_response(content="⌛ This challenge has timed out.")
         else:

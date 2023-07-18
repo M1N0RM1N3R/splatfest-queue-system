@@ -1,8 +1,11 @@
 import logging
-import discord
 import random
+
+import discord
+
 from classes import *
 from helpers.command_arg_types import timestamp
+from helpers.embed_templates import EmbedStyle
 
 log = logging.getLogger(__name__)
 
@@ -31,10 +34,7 @@ class ToolsCog(discord.Cog):
         }.items()
     ]
 
-    @root.command(
-        name="timestamp",
-        description="Convert a specified time into a Discord timestamp.",
-    )
+    @root.command()
     async def timestamp(
         self,
         ctx: discord.ApplicationContext,
@@ -49,22 +49,29 @@ class ToolsCog(discord.Cog):
         """Generates a Discord timestamp from a given date and time.
 
         Args:
-            when (timestamp, optional): The date/time to convert.
-            format (enum, optional): The type of timestamp to generate.
+            when (datetime, optional): The date/time to convert.
+            format (str enum, optional): The type of timestamp to generate.
             ephemeral (bool, optional): Whether to hide the result from other users. Defaults to True.
         """
-        result = f"<t:{int(when.timestamp())}:{format}>".format(when.timestamp())
-        await ctx.send_response(
-            f"✅ {when.isoformat()}: `{result}` (Preview: {result})", ephemeral=ephemeral
+        result = discord.utils.format_dt(when, style=format)
+        await ctx.respond(
+            embed=EmbedStyle.Ok.value.embed()
+            .add_field(name="Time/date", value=when.isoformat())
+            .add_field(name="Formatted timestamp", value=f"`{result}`")
+            .add_field(name="Preview", value=result),
+            ephemeral=ephemeral,
         )
 
-    @root.command(
-        name="lan-ip", description="Generate a random, valid IP for classic LAN play."
-    )
+    @root.command()
     async def lan_ip(self, ctx: discord.ApplicationContext):
         """Generates a random, valid console IP address for use in a classic LAN play setup."""
         ip = gen_lan_ip()
-        await ctx.send_response(f"✅ `10.13.{ip[0]}.{ip[1]}`", ephemeral=True)
+        await ctx.respond(
+            embed=EmbedStyle.Ok.value.embed().add_field(
+                name="Generated IP", value=f"10.13.{ip[0]}.{ip[1]}"
+            ),
+            ephemeral=True,
+        )
 
 
 def setup(bot: discord.Bot):

@@ -1,45 +1,54 @@
 import datetime
-from typing import List
+from typing import Generic, List, TypeVar
 
 import dateparser
 import discord
+from discord.ext.commands import BadArgument, Converter
 from natural.date import compress as hr_duration
-from pytimeparse.timeparse import timeparse as duration_parse
+from pytimeparse.timeparse import timeparse
+
+from helpers.db_handling_sdb import R, connection
 
 
 def timestamp_autocomplete(actx: discord.AutocompleteContext) -> List[str]:
-    try:
-        return [dateparser.parse(actx.value).replace(microsecond=0).isoformat()]
-    except AttributeError:
-        return [f'Invalid/unknown format: "{actx.value}"']
+    dt = dateparser.parse(actx.value)
+    if isinstance(dt, datetime.datetime):
+        return [dt.replace(microsecond=0).isoformat()]
+    else:
+        return [f'❌ Invalid/unknown format: "{actx.value}"']
 
 
-def duration_autocomplete(actx: discord.AutocompleteContext) -> List[str]:
-    if seconds := duration_parse(actx.value):
+def timedelta_autocomplete(actx: discord.AutocompleteContext) -> List[str]:
+    if seconds := timeparse(actx.value):
         return [hr_duration(seconds)]
     else:
-        return [f'Invalid/unknown format: "{actx.value}"']
+        return [f'❌ Invalid/unknown format: "{actx.value}"']
 
-class TimestampConverter(discord.ext.commands.Converter):
+
+class TimestampConverter(Converter):
     async def convert(self, ctx, argument):
         if not (res := dateparser.parse(argument)):
-            raise discord.ext.commands.BadArgument(f'Invalid/unknown format: "{argument}"')
+            raise BadArgument(f'Invalid/unknown timestamp format: "{argument}"')
         return res.replace(microsecond=0)
+
 
 def timestamp(**kwargs):
     return discord.Option(
         TimestampConverter, autocomplete=timestamp_autocomplete, **kwargs
     )
 
-class DurationConverter(discord.ext.commands.Converter):
-    async def convert(self, ctx, argument):
-        if res := duration_parse(argument):
-            return datetime.timedelta(seconds=res)
-        else: raise discord.ext.commands.BadArgument(f'Invalid/unknown format: "{argument}"')
 
-def duration(**kwargs):
+class TimeDeltaConverter(Converter):
+    async def convert(self, ctx, argument):
+        if res := timeparse(argument):
+            return datetime.timedelta(seconds=res)
+        else:
+            raise BadArgument(f'Invalid/unknown duration format: "{argument}"')
+
+
+def timedelta(**kwargs):
     return discord.Option(
-        DurationConverter,
-        autocomplete=duration_autocomplete,
+        TimeDeltaConverter,
+        autocomplete=timedelta_autocomplete,
         **kwargs,
     )

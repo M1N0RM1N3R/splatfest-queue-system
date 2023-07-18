@@ -5,7 +5,10 @@ shortuuid
 glicko2
 pytimeparse
 natural
-jsonpickle
 surrealdb
-captcha
-requests
+openskill
+dataclasses-json
+orjson
+docstring-parser
+multicolorcaptcha
+tomli

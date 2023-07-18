@@ -2,17 +2,20 @@ import asyncio
 import datetime
 import json
 from dataclasses import dataclass, field
-from typing import Callable, Dict
+from typing import Callable, Dict, Optional
 
 import discord
+import tomllib
+
 
 secrets: Dict[str, str] = json.load(open("secrets.json"))
-config = json.load(open(secrets['config_file']))
+with open(secrets["config_file"], "rb") as toml:
+    config = tomllib.load(toml)
 
 
 async def wait_for(
     condition: Callable[..., bool],
-    timeout: float = None,
+    timeout: Optional[float] = None,
     poll_interval: float = 0.1,
     *args,
     **kwargs,

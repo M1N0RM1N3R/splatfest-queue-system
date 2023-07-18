@@ -12,7 +12,7 @@ from discord.ext.pages import Paginator
 from marshmallow import fields
 from PIL import Image
 
-from classes import config
+from bot import config
 from helpers import emote_images
 from helpers.command_checks import StaffLevel, in_channel, required_staff_level
 from helpers.common_views import ButtonSelect, Confirm

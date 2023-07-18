@@ -3,7 +3,7 @@ import random
 
 import discord
 
-from classes import *
+
 from helpers.command_arg_types import timestamp
 from helpers.embed_templates import EmbedStyle
 

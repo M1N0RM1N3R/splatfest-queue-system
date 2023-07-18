@@ -2,17 +2,18 @@ import contextlib
 import logging
 import os
 from abc import abstractmethod
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from typing import Any, Optional
+import datetime
 
 import discord
 from discord.ext.pages import Paginator
 
 from bot import bot
-from classes import *
 from cogs.scheduled_tasks import Task, ignore_metadata
 from helpers.command_arg_types import timedelta
-from helpers.command_checks import StaffLevel, get_staff_level, required_staff_level
+from helpers.command_checks import (StaffLevel, get_staff_level,
+                                    required_staff_level)
 from helpers.db_handling_sdb import Resource, connection, now
 from helpers.embed_templates import EmbedStyle
 
@@ -23,8 +24,8 @@ log = logging.getLogger(__name__)
 class ModAction(Resource):
     issuer_id: int
     target_id: int
-    reason: str = None
-    auto_lift_task: Task = None
+    reason: str = field(default=None, kw_only=True)
+    auto_lift_task: Task = field(default=None, kw_only=True)
 
     @property
     def expires(self) -> Optional[datetime.datetime]:
@@ -402,7 +403,7 @@ class ModCog(discord.Cog):
     async def channel_mute(
         self,
         ctx: discord.ApplicationContext,
-        channel: discord.GuildChannel,
+        channel: discord.abc.GuildChannel,
         target: discord.Member,
         reason: str = None,
         duration: timedelta() = None,

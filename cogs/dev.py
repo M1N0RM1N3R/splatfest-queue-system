@@ -2,11 +2,12 @@ import logging
 import os
 import sys
 from inspect import isawaitable
+from io import StringIO
 
 import discord
 from aiohttp import client
 
-from classes import *
+from bot import secrets
 from helpers.db_handling_sdb import connection
 from helpers.embed_templates import EmbedStyle
 
@@ -66,9 +67,9 @@ class DevCog(discord.Cog):
         checks=[is_owner],
     )
 
-    async def fetch_merge(self, ctx, commit_id):
+    async def fetch_merge(self, ctx, commit_id, branch: str = 'main'):
         # Fetch and merge commit from GitHub
-        for cmd in ["git fetch origin main", f"git merge {commit_id}"]:
+        for cmd in [f"git fetch origin {branch}", f"git merge {commit_id}"]:
             if exit_status := await self.bot.loop.run_in_executor(None, os.system, cmd):
                 raise OSError(
                     f"Failed to fetch-merge commit {commit_id}: {cmd} returned exit status {exit_status}"
@@ -82,6 +83,7 @@ class DevCog(discord.Cog):
             script (str): The Python script to execute.
         """
         await ctx.defer(ephemeral=True)
+
         output = eval(script)
         if isawaitable(output):
             output = await output
@@ -109,14 +111,15 @@ class DevCog(discord.Cog):
             )
 
     @root.command(description="Update cogs without a cold start.")
-    async def hot_update(self, ctx: discord.ApplicationContext, commit_id: str):
+    async def hot_update(self, ctx: discord.ApplicationContext, commit_id: str, branch: str = 'main'):
         """Automatically update Kolkra's cogs (command modules) without taking her offline entirely. Updates to code/config info outside of cogs requires a full update.
         
         Args:
-            commit_id (str): The commit ID to update to. The commit must be on the main branch.
+            commit_id (str): The commit ID to update to.
+            branch (str): The branch the commit belongs to. Defaults to main.
         """
         await ctx.defer(ephemeral=True)
-        await self.fetch_merge(ctx, commit_id)
+        await self.fetch_merge(ctx, commit_id, branch)
         if errors := reload_cogs():
             error_list = "\n".join([f"- {k}: {v}" for k, v in errors.items()])
             return await ctx.respond(
@@ -150,11 +153,12 @@ class DevCog(discord.Cog):
         os.execv(sys.executable, args)
 
     @root.command(description="Update Kolkra's files, then restart.")
-    async def full_update(self, ctx: discord.ApplicationContext, commit_id: str):
+    async def full_update(self, ctx: discord.ApplicationContext, commit_id: str, branch: str = 'main'):
         """Update Kolkra's files, then self-restart.
         
         Args:
             commit_id (str): The commit ID to update to. The commit must be on the main branch.
+            branch (str): The branch the commit belongs to. Defaults to main.
         """
         await ctx.defer(ephemeral=True)
         await self.fetch_merge(ctx, commit_id)

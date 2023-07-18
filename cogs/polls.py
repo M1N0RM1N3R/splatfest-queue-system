@@ -5,7 +5,6 @@ from dataclasses import dataclass, field, replace
 
 import discord
 
-from classes import clean
 from cogs.scheduled_tasks import Task
 from helpers.command_arg_types import timestamp
 from helpers.db_handling_sdb import Resource, connection, now

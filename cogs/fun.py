@@ -8,7 +8,7 @@ import discord
 import discord.ext.commands as cmd
 from discord.ext import tasks
 
-from classes import *
+
 
 log = logging.getLogger(__name__)
 

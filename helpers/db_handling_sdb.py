@@ -13,7 +13,7 @@ from surrealdb import Surreal
 from surrealdb.ws import ConnectionState, SurrealPermissionException
 
 
-from classes import config, secrets
+from bot import config, secrets
 
 log = logging.getLogger(__name__)
 

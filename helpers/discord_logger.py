@@ -8,7 +8,6 @@ from os.path import relpath
 
 import discord
 
-from classes import clean
 
 
 def truncate_and_codeblock(original: str, max_length: int, placeholder: str = "..."):
@@ -45,7 +44,7 @@ class DiscordLogHandler(logging.Handler):
     def emit(self, record: logging.LogRecord) -> None:
         embed = discord.Embed(
             title=f"{record.levelname} at {record.module}:{record.lineno} in {record.funcName}",
-            description=truncate_and_codeblock(clean(record.message), 4000),
+            description=truncate_and_codeblock(discord.utils.escape_markdown(record.message), 4000),
             timestamp=datetime.datetime.fromtimestamp(record.created),
         )
 

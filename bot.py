@@ -8,15 +8,17 @@ import discord
 from discord.errors import CheckFailure
 from discord.ext import commands
 from docstring_parser.google import parse as parse_docstring
+import tomllib
 
-from helpers.db_handling_sdb import connection as db_connection
 from helpers.embed_templates import EmbedStyle
-from classes import config, secrets
 
 log = logging.getLogger(__name__)
 
-#secrets: Dict[str, str] = json.load(open("secrets.json"))
-#config = json.load(open(secrets["config_file"]))
+secrets: Dict[str, str] = json.load(open("secrets.json"))
+with open(secrets["config_file"], "rb") as toml:
+    config = tomllib.load(toml)
+    log.info("Current configuration:\n%s", json.dumps(config))
+print("guild id", type(config["guild"]))
 bot = discord.Bot(
     debug_guilds=[config["guild"]],
     intents=discord.Intents(
@@ -29,6 +31,7 @@ guild = lambda: bot.get_guild(config["guild"])
 @bot.slash_command()
 async def ping(ctx):
     """Ensures that the bot is working properly, and shows the system latency."""
+    from helpers.db_handling_sdb import connection as db_connection
     global last_ready_time
     await ctx.respond(
         embed=EmbedStyle.Ok.value.embed(title="Pong!")

@@ -4,12 +4,12 @@ from typing import Any
 
 from discord.ext import tasks
 
-from bot import bot
-from classes import *
+from bot import bot, config, secrets
+
 from helpers.discord_logger import DiscordLogHandler
 
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.DEBUG,
     format="[%(asctime)s] %(levelname)s %(module)s:%(lineno)d   %(message)s",
 )
 logging.getLogger().addHandler(

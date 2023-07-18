@@ -4,7 +4,7 @@ import logging
 import discord
 import discord.ext.commands as cmd
 
-from classes import *
+from bot import config
 from cogs.scheduled_tasks import Task
 from helpers.db_handling_sdb import now
 from helpers.embed_templates import EmbedStyle
@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
 
 async def reminder_callback():
     from bot import bot
-    from classes import config
+    from bot import config
 
     await bot.get_channel(config["bump_reminder"]["channel"]).send(
         " ".join(
@@ -34,14 +34,17 @@ class BumpReminderCog(discord.Cog):
     @cmd.Cog.listener()
     async def on_message(self, message: discord.Message):
         # Check if message matches the criteria for a "bump done" confirmation from the DISBOARD bot
-        if not all(
-            [
-                message.channel.id == config["bump_reminder"]["channel"],
-                message.author.id == 302050872383242240,
-                message.embed.image.url
-                == "https://disboard.org/images/bot-command-image-bump.png",
-            ]
-        ):
+        try:
+            if not all(
+                [
+                    message.channel.id == config["bump_reminder"]["channel"],
+                    message.author.id == 302050872383242240,
+                    message.embed.image.url
+                    == "https://disboard.org/images/bot-command-image-bump.png",
+                ]
+            ):
+                return
+        except AttributeError as e:
             return
 
         # Schedule the next reminder for 2 hours

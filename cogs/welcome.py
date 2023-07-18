@@ -4,7 +4,7 @@ import discord
 import discord.ext.commands as cmd
 from aiohttp import client as aiohttp
 
-from classes import *
+from bot import config, secrets
 
 log = logging.getLogger(__name__)
 

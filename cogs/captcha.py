@@ -9,7 +9,7 @@ import discord
 import discord.ext.commands as cmd
 from multicolorcaptcha import CaptchaGenerator
 
-from classes import config
+from bot import config
 from helpers.command_checks import StaffLevel, has_role, required_staff_level
 from helpers.embed_templates import EmbedStyle
 

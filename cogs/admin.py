@@ -4,7 +4,7 @@ from typing import Optional
 
 import discord
 
-from classes import *
+
 from helpers.command_checks import StaffLevel, required_staff_level
 from helpers.embed_templates import EmbedStyle
 

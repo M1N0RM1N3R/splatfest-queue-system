@@ -4,7 +4,7 @@ from typing import Optional
 
 import discord
 
-from classes import config
+from bot import config
 from helpers.db_handling_sdb import Resource, connection
 
 log = logging.getLogger(__name__)

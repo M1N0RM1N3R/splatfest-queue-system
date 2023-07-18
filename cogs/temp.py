@@ -2,7 +2,7 @@ import logging
 
 import discord
 
-from classes import *
+
 from cogs.scheduled_tasks import Task
 from helpers.command_arg_types import timedelta
 from helpers.db_handling_sdb import now

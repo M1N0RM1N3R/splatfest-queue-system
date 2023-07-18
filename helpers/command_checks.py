@@ -3,7 +3,7 @@ from typing import Callable
 
 import discord
 
-from classes import config
+from bot import config
 from helpers.embed_templates import EmbedStyle
 
 

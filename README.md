@@ -1,3 +1,7 @@
+> [!IMPORTANT]
+> This repo is no longer maintained.
+> Go to [m1n0rm1n3r/kolkra-ng](https://github.com/m1n0rm1n3r/kolkra-ng) for the current version.
+
 # Splatfest Queue System (A.K.A. Kolkra)
 The Splatfest Queue System (SQS for short) is a custom Discord bot built to streamline matchmaking and other tasks in the [Splatfest Discord server](https://discord.gg/rhAH6vp).
 
